@@ -1,9 +1,31 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Panou Principal</PageTitle>
 
-<h1>Hello, world!</h1>
+<RadzenCard Style="margin: 2rem;">
+    <h1 class="rz-text-primary">Bine ai venit în sistemul de monitorizare inteligentă a traficului!</h1>
 
-Welcome to your new app.
+    <p>
+        Această aplicație oferă o platformă completă pentru:
+    </p>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <ul>
+        <li>Monitorizarea în timp real a traficului rutier</li>
+        <li>Gestionarea senzorilor și a intersecțiilor inteligente</li>
+        <li>Analiza și optimizarea rutelor eco-friendly</li>
+        <li>Vizualizarea statisticilor de trafic și impact asupra mediului</li>
+    </ul>
+
+    <RadzenAlert Severity="Info" Style="margin-top: 1rem;">
+        Navighează din meniul din stânga pentru a începe explorarea funcționalităților aplicației.
+    </RadzenAlert>
+
+    <RadzenCard Style="margin-top: 2rem; background-color: #f0f4f8;">
+        <h3>Status sistem:</h3>
+        <ul>
+            <li><strong>Număr intersecții monitorizate:</strong> 12</li>
+            <li><strong>Senzori activi:</strong> 58</li>
+            <li><strong>Ultima actualizare:</strong> @DateTime.Now.ToString("dd MMMM yyyy, HH:mm")</li>
+        </ul>
+    </RadzenCard>
+</RadzenCard>

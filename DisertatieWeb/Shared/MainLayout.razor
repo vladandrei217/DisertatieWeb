@@ -1,20 +1,70 @@
 ﻿@inherits LayoutComponentBase
 
 <RadzenComponents />
-<PageTitle>DisertatieWeb</PageTitle>
+<PageTitle>Bun venit!</PageTitle>
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        @* <NavMenu /> *@
+        <RadzenSidebar Style="background-color: #ffffff; border-right: 1px solid #e0e0e0; height: 100%;">
+        <RadzenPanelMenu Click="OnParentClicked" Multiple="@multiple">
+
+            <RadzenPanelMenuItem Text="Dashboard" Icon="dashboard">
+                <RadzenPanelMenuItem Text="Statistici Generale" Path="dashboard" Icon="insights"></RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Monitorizare Trafic" Icon="traffic">
+                <RadzenPanelMenuItem Text="Hărți Intersecții" Path="intersectii" Icon="map"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Fluxuri de Trafic" Path="fluxuri" Icon="timeline"></RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Senzori" Icon="sensors">
+                <RadzenPanelMenuItem Text="Status Senzori" Path="senzori-status" Icon="wifi"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Configurare" Path="senzori-config" Icon="settings_input_antenna"></RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Rute Eco" Icon="directions">
+                <RadzenPanelMenuItem Text="Rute Alternative" Path="rute-eco" Icon="alt_route"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Sugestii Optimizare" Path="sugestii" Icon="trending_up"></RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Statistici & Grafice" Icon="bar_chart">
+                <RadzenPanelMenuItem Text="Emisii CO₂" Path="emisii" Icon="cloud"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Consumul de combustibil" Path="consum" Icon="local_gas_station"></RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Administrare" Icon="admin_panel_settings">
+                <RadzenPanelMenuItem Text="Utilizatori" Path="utilizatori" Icon="group"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Setări" Path="setari" Icon="settings"></RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
+
+            <RadzenPanelMenuItem Text="Ajutor" Icon="help_outline">
+                <RadzenPanelMenuItem Text="Documentație" Path="documentatie" Icon="menu_book"></RadzenPanelMenuItem>
+                <RadzenPanelMenuItem Text="Contact" Path="contact" Icon="contact_support"></RadzenPanelMenuItem>
+            </RadzenPanelMenuItem>
+
+        </RadzenPanelMenu>
+    </RadzenSidebar>
     </div>
 
     <main>
-        <div class="top-row px-4">
+        @* <div class="top-row px-4">
             <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
+        </div> *@
+
+        
 
         <article class="content px-4">
             @Body
         </article>
     </main>
 </div>
+
+@code {
+    bool multiple = true;
+
+    void OnParentClicked(MenuItemEventArgs args)
+    {
+        Console.WriteLine($"{args.Text} clicked");
+    }
+}
