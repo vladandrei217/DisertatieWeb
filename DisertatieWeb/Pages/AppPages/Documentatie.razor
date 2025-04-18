@@ -1,0 +1,96 @@
+﻿@page "/documentatie"
+@using Radzen
+@inject NavigationManager Navigation
+
+<style>
+    .RadzenSplitterPane {
+        background-color: #f4f4f4;
+    }
+
+    .RadzenPanelMenu {
+        background-color: #eeeeee;
+    }
+
+    .RadzenSplitter {
+        border: 1px solid #ddd;
+    }
+</style>
+
+<PageTitle>Documentație</PageTitle>
+
+<RadzenSplitter Orientation="Orientation.Horizontal" Collapse=@OnCollapse Expand=@OnExpand style="height: 100vh; border: 1px solid rgba(0,0,0,.08);">
+    <!-- Panou pentru meniul de navigare -->
+    <RadzenSplitterPane Size="250px" Min="150px" Max="400px">
+        <RadzenPanelMenu Style="height: 100%; overflow-y: auto;">
+            <RadzenPanelMenuItem Text="Introducere" Icon="book"  />
+            <RadzenPanelMenuItem Text="Instalare" Icon="download"  />
+            <RadzenPanelMenuItem Text="Configurare" Icon="settings" />
+            <RadzenPanelMenuItem Text="Exemplu de utilizare" Icon="check_circle"  />
+            <RadzenPanelMenuItem Text="FAQ" Icon="help"  />
+        </RadzenPanelMenu>
+    </RadzenSplitterPane>
+
+    <!-- Panou pentru conținutul documentației -->
+    <RadzenSplitterPane>
+        <div style="padding: 20px; overflow-y: auto;">
+            <h4 id="introducere">Introducere</h4>
+            <p>
+                Aceasta este documentația aplicației noastre. Aplicația permite gestionarea senzorilor dintr-un sistem IoT.
+                În această secțiune, vei învăța cum să folosești aplicația pentru a vizualiza și configura senzorii.
+            </p>
+
+            <h4 id="instalare">Instalare</h4>
+            <p>
+                Pentru a instala aplicația, urmează pașii de mai jos:
+                <ol>
+                    <li>Descarcă aplicația de pe site-ul nostru oficial.</li>
+                    <li>Deschide fișierul de instalare și urmează pașii din wizard-ul de instalare.</li>
+                    <li>Aplicația va fi instalată pe sistemul tău și poate fi deschisă din meniul Start.</li>
+                </ol>
+            </p>
+
+            <h4 id="configurare">Configurare</h4>
+            <p>
+                După instalare, aplicația trebuie configurată pentru a interacționa cu senzorii tăi. Urmează acești pași pentru configurare:
+                <ul>
+                    <li>Accesează secțiunea "Configurare Senzori" din meniul principal.</li>
+                    <li>Selectează senzorii pe care vrei să îi configurezi.</li>
+                    <li>Alege tipul de configurare dorit și apasă pe "Salvează Configurație".</li>
+                </ul>
+            </p>
+
+            <h4 id="exemplu">Exemplu de utilizare</h4>
+            <p>
+                În această secțiune, îți vom arăta un exemplu pas cu pas despre cum să adaugi un senzor și să îl configurezi:
+                <ol>
+                    <li>Accesează pagina "Configurare Senzori".</li>
+                    <li>Selectează senzorul pe care vrei să-l configurezi din lista de senzori.</li>
+                    <li>Click pe butonul "Configurație".</li>
+                    <li>Modifică parametrii doriti (ex: Nume, Status) și apasă pe "Salvează Configurație".</li>
+                </ol>
+            </p>
+
+            <h4 id="faq">Întrebări frecvente (FAQ)</h4>
+            <p>
+                În această secțiune, vei găsi răspunsuri la întrebările frecvente:
+                <ul>
+                    <li><b>Ce fac dacă senzorul meu nu răspunde?</b><br />Verifică conexiunea la internet și asigură-te că senzorul este pornit.</li>
+                    <li><b>Cum pot adăuga un senzor nou?</b><br />Accesează pagina "Configurare Senzori" și apasă pe butonul "Adaugă Senor".</li>
+                </ul>
+            </p>
+        </div>
+    </RadzenSplitterPane>
+</RadzenSplitter>
+
+@code {
+
+    void OnCollapse(RadzenSplitterEventArgs args)
+    {
+        //
+    }
+
+    void OnExpand(RadzenSplitterEventArgs args)
+    {
+        //
+    }
+}

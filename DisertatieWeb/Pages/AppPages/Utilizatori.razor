@@ -1,0 +1,109 @@
+﻿@page "/utilizatori"
+@using DisertatieWeb.Models
+@using Radzen
+@inject NavigationManager Navigation
+@inject DialogService DialogService
+
+<PageTitle>Utilizatori</PageTitle>
+
+<!-- Meniul de administrare -->
+<div class="admin-menu">
+    <RadzenButton Text="Adaugă Utilizator" Icon="add" ButtonStyle="ButtonStyle.Primary" Click="ShowAddUserDialog" />
+</div>
+
+<!-- Tabelul cu utilizatori -->
+<RadzenDataGrid TItem="UserModel" Data="@users" RowSelect="OnRowSelect" AllowPaging="true" PageSize="5" AllowSorting="true">
+    <Columns>
+        <RadzenDataGridColumn TItem="UserModel" Property="Id" Title="ID" />
+        <RadzenDataGridColumn TItem="UserModel" Property="Nume" Title="Nume" />
+        <RadzenDataGridColumn TItem="UserModel" Property="Email" Title="Email" />
+        <RadzenDataGridColumn TItem="UserModel" Context="user" Title="Acțiuni">
+            <Template Context="user">
+                <RadzenButton Icon="edit" Text="Editează" ButtonStyle="ButtonStyle.Secondary" Click="() => ShowEditUserDialog(user)" />
+                <RadzenButton Icon="delete" Text="Șterge" ButtonStyle="ButtonStyle.Danger" Click="() => DeleteUser(user)" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private List<UserModel> users = new List<UserModel>
+        {
+        new UserModel { Id = 1, Nume = "Ion Popescu", Email = "ion.popescu@example.com" },
+        new UserModel { Id = 2, Nume = "Maria Ionescu", Email = "maria.ionescu@example.com" }
+        };
+
+    private UserModel selectedUser;
+    private UserModel newUser = new UserModel();
+
+   
+
+    private async Task ShowAddUserDialog()
+    {
+        newUser = new UserModel(); // Resetează câmpurile pentru un utilizator nou
+
+        await DialogService.OpenAsync("Adaugă Utilizator", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenTextBox @bind-Value="newUser.Nume" Placeholder="Nume Utilizator" />
+        <RadzenTextBox @bind-Value="newUser.Email" Placeholder="Email Utilizator" />
+        <RadzenButton Text="Adaugă" ButtonStyle="ButtonStyle.Primary" Click="AddUser" />
+    </RadzenStack>);
+        
+    }
+
+    // Afișează dialogul pentru editarea unui utilizator
+    private async Task ShowEditUserDialog(UserModel user)
+    {
+        try
+        {
+            selectedUser = user; // Setează utilizatorul selectat pentru editare
+
+            await DialogService.OpenAsync("Editează Utilizator", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <RadzenTextBox @bind-Value="selectedUser.Nume" Placeholder="Nume Utilizator" />
+        <RadzenTextBox @bind-Value="selectedUser.Email" Placeholder="Email Utilizator" />
+        <RadzenButton Text="Salvează Modificări" ButtonStyle="ButtonStyle.Primary" Click="() => EditUser()" />
+    </RadzenStack>);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Eroare la deschiderea dialogului de editare: {ex.Message}");
+        }
+    }
+
+    // Adaugă un utilizator
+    private void AddUser()
+    {
+        if (newUser != null)
+        {
+            newUser.Id = users.Count + 1; // Generare ID
+            users.Add(newUser); // Adăugarea utilizatorului în listă
+        }
+    }
+
+    // Editează un utilizator
+    private void EditUser()
+    {
+        if (selectedUser != null)
+        {
+            var user = users.FirstOrDefault(u => u.Id == selectedUser.Id);
+            if (user != null)
+            {
+                user.Nume = selectedUser.Nume;
+                user.Email = selectedUser.Email;
+            }
+        }
+    }
+
+    // Șterge un utilizator
+    private void DeleteUser(UserModel user)
+    {
+        users.Remove(user); // Șterge utilizatorul din listă
+    }
+
+    // Selectarea unui rând
+    private void OnRowSelect(UserModel user)
+    {
+        selectedUser = user;
+    }
+}

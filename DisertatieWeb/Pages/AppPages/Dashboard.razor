@@ -1,0 +1,86 @@
+﻿@page "/dashboard"
+@using DisertatieWeb.Models
+
+<PageTitle>Statistici Generale</PageTitle>
+
+<h3 class="rz-mb-4">Statistici Generale</h3>
+
+<RadzenRow>
+    <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
+        <h5>Vehicule active</h5>
+        <p>@stats?.VehiculeActive vehicule</p>
+    </RadzenCard>
+    <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
+        <h5>Emisii CO₂</h5>
+        <p>@stats?.EmisiiCo2.ToString("0.00") kg</p>
+    </RadzenCard>
+    <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
+        <h5>Alerte active</h5>
+        <p>@stats?.AlerteActive</p>
+    </RadzenCard>
+    <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
+        <h5>Consum combustibil</h5>
+        <p>@stats?.ConsumCombustibil.ToString("0.00") L</p>
+    </RadzenCard>
+</RadzenRow>
+
+<RadzenRow>
+    <RadzenColumn Size="12" SizeMd="6">
+        <RadzenCard>
+            <h5>Trafic Zilnic</h5>
+            <RadzenChart>
+                <RadzenLineSeries Data="@stats?.TraficZilnic" CategoryProperty="Data" ValueProperty="Vehicule" />
+                <RadzenCategoryAxis FormatString="dd/MM" />
+            </RadzenChart>
+        </RadzenCard>
+    </RadzenColumn>
+
+    <RadzenColumn Size="12" SizeMd="6">
+        <RadzenCard>
+            <h5>Evenimente Recente</h5>
+            <RadzenDataGrid Data="@evenimenteRecente" TItem="EvenimentTrafic" ShowPagingSummary="true" PageSize="5">
+                <Columns>
+                    <RadzenDataGridColumn TItem="EvenimentTrafic" Property="Tip" Title="Tip" />
+                    <RadzenDataGridColumn TItem="EvenimentTrafic" Property="Locatie" Title="Locație" />
+                    <RadzenDataGridColumn TItem="EvenimentTrafic" Property="Data" Title="Dată" FormatString="{0:dd/MM/yyyy HH:mm}" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    DashboardStats stats;
+    List<EvenimentTrafic> evenimenteRecente = new();
+
+    protected override void OnInitialized()
+    {
+        // Simulare date
+        stats = new DashboardStats
+            {
+                VehiculeActive = 328,
+                EmisiiCo2 = 712.45,
+                AlerteActive = 12,
+                ConsumCombustibil = 451.3,
+                TraficZilnic = Enumerable.Range(1, 7).Select(i => new DailyTraffic
+                {
+                    Data = DateTime.Today.AddDays(-i),
+                    Vehicule = new Random().Next(200, 500)
+                }).ToList()
+            };
+
+        evenimenteRecente = new List<EvenimentTrafic>
+        {
+            new() { Tip = "Accident", Locatie = "Bd. Republicii", Data = DateTime.Now.AddMinutes(-30) },
+            new() { Tip = "Blocaj", Locatie = "Str. Libertatii", Data = DateTime.Now.AddHours(-2) },
+            new() { Tip = "Semafor defect", Locatie = "Calea Victoriei", Data = DateTime.Now.AddHours(-4) }
+        };
+    }
+
+    public class EvenimentTrafic
+    {
+        public string Tip { get; set; }
+        public string Locatie { get; set; }
+        public DateTime Data { get; set; }
+    }
+}

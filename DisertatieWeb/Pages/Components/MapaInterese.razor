@@ -1,0 +1,24 @@
+﻿@using DisertatieWeb.Models
+<div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
+
+@code {
+    [Parameter] public List<SenzorTrafic> Senzori { get; set; } = new();
+    [Parameter] public EventCallback<int> OnSenzorSelectat { get; set; }
+
+    [Inject] IJSRuntime JS { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initMap", Senzori);
+        }
+    }
+
+    [JSInvokable("SelecteazaSenzorInComponenta")]
+    public static Task SelecteazaSenzor(int id)
+    {
+        //OnSenzorSelectat.InvokeAsync(id);
+        return Task.CompletedTask;
+    }
+}

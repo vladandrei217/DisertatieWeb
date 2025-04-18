@@ -1,0 +1,134 @@
+﻿@page "/setari"
+@using Radzen
+@inject NotificationService NotificationService
+
+<RadzenCard Style="margin: 2rem">
+    <RadzenTabs Visible="true">
+        <RadzenTabsItem Visible="true" Text="General">
+            <div class="p-3 space-y-4">
+                <RadzenFieldset Text="Informații Aplicație">
+                    <RadzenTextBox @bind-Value="appName" Placeholder="Nume aplicație" Style="width: 300px;" />
+                    <RadzenTextBox @bind-Value="appDescription" Placeholder="Descriere" Style="width: 500px;" />
+                    <div class="mt-2 d-flex align-items-center">
+                        <RadzenSwitch @bind-Value="maintenanceMode" />
+                        <label class="ms-2">Mod mentenanță activ</label>
+                    </div>
+                </RadzenFieldset>
+
+                <RadzenFieldset Text="Localizare">
+                    <RadzenDropDown @bind-Value="selectedLanguage"
+                                    Data="@languages"
+                                    TextProperty="Name"
+                                    ValueProperty="Code"
+                                    Placeholder="Selectează limba"
+                                    Style="width: 300px;" />
+                    <RadzenDropDown @bind-Value="timezone"
+                                    Data="@timezones"
+                                    Placeholder="Selectează fus orar"
+                                    Style="width: 300px;" />
+                </RadzenFieldset>
+            </div>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Securitate">
+            <div class="p-3 space-y-4">
+                <RadzenFieldset Text="Parolă">
+                    <RadzenNumeric @bind-Value="minPasswordLength" Min="6" Max="20" Style="width: 150px;" />
+                    <label class="ms-3">Lungime minimă</label>
+
+                    <div class="mt-2 d-flex align-items-center">
+                        <RadzenSwitch @bind-Value="requireSpecialChar" />
+                        <label class="ms-2">Necesită caractere speciale</label>
+                    </div>
+                </RadzenFieldset>
+
+                <RadzenFieldset Text="Autentificare">
+                    <RadzenSwitch @bind-Value="enable2FA" />
+                    <label class="ms-2">Activează autentificare în doi pași (2FA)</label>
+                </RadzenFieldset>
+            </div>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Notificări">
+            <div class="p-3 space-y-4">
+                <RadzenFieldset Text="Email">
+                    <RadzenTextBox @bind-Value="emailFrom" Placeholder="Adresa expeditor" Style="width: 300px;" />
+                    <div class="mt-2 d-flex align-items-center">
+                        <RadzenSwitch @bind-Value="emailNotifications" />
+                        <label class="ms-2">Activează notificări pe email</label>
+                    </div>
+                </RadzenFieldset>
+
+                <RadzenFieldset Text="SMS">
+                    <RadzenTextBox @bind-Value="smsProviderApiKey" Placeholder="API Key Provider SMS" Style="width: 400px;" />
+                    <div class="mt-2 d-flex align-items-center">
+                        <RadzenSwitch @bind-Value="smsNotifications" />
+                        <label class="ms-2">Activează notificări SMS</label>
+                    </div>
+                </RadzenFieldset>
+            </div>
+        </RadzenTabsItem>
+    </RadzenTabs>
+
+    <div class="mt-4 d-flex">
+        <RadzenButton Text="Salvează Setări" Click="@SaveSettings" ButtonStyle="ButtonStyle.Primary" Style="margin-right: 1rem;" />
+        <RadzenButton Text="Resetează" Click="@ResetSettings" ButtonStyle="ButtonStyle.Secondary" />
+    </div>
+</RadzenCard>
+
+@code {
+    private string appName = "MyApp";
+    private string appDescription = "Aplicație de administrare";
+    private bool maintenanceMode = false;
+
+    private string selectedLanguage = "ro";
+    private List<LanguageItem> languages = new()
+    {
+        new LanguageItem { Code = "ro", Name = "Română" },
+        new LanguageItem { Code = "en", Name = "Engleză" }
+    };
+    private string timezone = "Europe/Bucharest";
+    private List<string> timezones = new()
+    {
+        "Europe/Bucharest", "Europe/London", "America/New_York", "Asia/Bangkok"
+    };
+
+    private int minPasswordLength = 8;
+    private bool requireSpecialChar = true;
+    private bool enable2FA = false;
+
+    private string emailFrom = "admin@myapp.com";
+    private bool emailNotifications = true;
+    private string smsProviderApiKey = "";
+    private bool smsNotifications = false;
+
+    private async Task SaveSettings()
+    {
+        await Task.Delay(300);
+        NotificationService.Notify(NotificationSeverity.Success, "Setările au fost salvate.");
+    }
+
+    private void ResetSettings()
+    {
+        appName = "MyApp";
+        appDescription = "Aplicație de administrare";
+        maintenanceMode = false;
+        selectedLanguage = "ro";
+        timezone = "Europe/Bucharest";
+        minPasswordLength = 8;
+        requireSpecialChar = true;
+        enable2FA = false;
+        emailFrom = "admin@myapp.com";
+        emailNotifications = true;
+        smsProviderApiKey = "";
+        smsNotifications = false;
+
+        NotificationService.Notify(NotificationSeverity.Warning, "Setările au fost resetate.");
+    }
+
+    public class LanguageItem
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+    }
+}

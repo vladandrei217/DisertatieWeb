@@ -1,0 +1,86 @@
+﻿@page "/fluxuri"
+@using DisertatieWeb.Models
+@using Radzen
+@inject DialogService DialogService
+
+<PageTitle>Fluxuri de Trafic</PageTitle>
+
+<h3>Monitorizare Fluxuri de Trafic</h3>
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true"
+                PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@fluxuri" ColumnWidth="250px" LogicalFilterOperator="LogicalFilterOperator.Or"
+                SelectionMode="DataGridSelectionMode.Single">
+    <Columns>
+        <RadzenDataGridColumn TItem="FluxTrafic" Property="Nume" Title="Nume Flux" />
+        <RadzenDataGridColumn TItem="FluxTrafic" Property="Descriere" Title="Descriere" />
+        <RadzenDataGridColumn TItem="FluxTrafic" Property="DataUltimeiActualizari" Title="Ultima Actualizare"
+                              FormatString="{0:yyyy-MM-dd HH:mm}" />
+        <RadzenDataGridColumn TItem="FluxTrafic" Context="flux" Title="Detalii">
+            <Template Context="flux">
+                <RadzenButton Icon="info" Text="Detalii" ButtonStyle="ButtonStyle.Primary"
+                              Click="() => ShowFluxDetaliiDialog(flux)" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private List<FluxTrafic> fluxuri = new();
+    private FluxTrafic fluxSelectat;
+
+    protected override void OnInitialized()
+    {
+        // Simulăm datele pentru fluxurile de trafic
+        fluxuri = new List<FluxTrafic>
+            {
+            new FluxTrafic
+            {
+                Id = 1,
+                Nume = "Flux Piața Victoriei - Bd. Unirii",
+                Descriere = "Măsurători trafic pe traseul Piața Victoriei - Bd. Unirii",
+                DataUltimeiActualizari = DateTime.Now.AddMinutes(-30),
+                Detalii = new List<FluxTraficDetalii>
+                {
+                    new FluxTraficDetalii { Id = 1, Ora = DateTime.Now.AddMinutes(-30), Valoare = 150 },
+                    new FluxTraficDetalii { Id = 2, Ora = DateTime.Now.AddMinutes(-15), Valoare = 200 },
+                    new FluxTraficDetalii { Id = 3, Ora = DateTime.Now, Valoare = 180 }
+                }
+            },
+            new FluxTrafic
+            {
+                Id = 2,
+                Nume = "Flux Bd. Unirii - Piața Universității",
+                Descriere = "Măsurători trafic pe Bd. Unirii",
+                DataUltimeiActualizari = DateTime.Now.AddMinutes(-45),
+                Detalii = new List<FluxTraficDetalii>
+                {
+                    new FluxTraficDetalii { Id = 1, Ora = DateTime.Now.AddMinutes(-45), Valoare = 100 },
+                    new FluxTraficDetalii { Id = 2, Ora = DateTime.Now.AddMinutes(-20), Valoare = 120 },
+                    new FluxTraficDetalii { Id = 3, Ora = DateTime.Now.AddMinutes(-5), Valoare = 90 }
+                }
+            }
+            };
+    }
+
+    // Funcția pentru a deschide dialogul cu detalii
+    private async Task ShowFluxDetaliiDialog(FluxTrafic flux)
+    {
+        fluxSelectat = flux;
+
+        await DialogService.OpenAsync("Detalii Flux Trafic", ds =>
+    @<RadzenStack Gap="1.5rem">
+        <p><b>@fluxSelectat.Nume</b> - @fluxSelectat.Descriere</p>
+        <p><b>Ultima Actualizare:</b> @fluxSelectat.DataUltimeiActualizari.ToString("yyyy-MM-dd HH:mm")</p>
+
+        <RadzenDataGrid Data="@fluxSelectat.Detalii" TItem="FluxTraficDetalii">
+            <Columns>
+                <RadzenDataGridColumn TItem="FluxTraficDetalii" Property="Ora" Title="Ora" FormatString="{0:HH:mm}" />
+                <RadzenDataGridColumn TItem="FluxTraficDetalii" Property="Valoare" Title="Valoare (Vehicule/min)" />
+            </Columns>
+        </RadzenDataGrid>
+        <RadzenButton Text="Închide" ButtonStyle="ButtonStyle.Secondary" Click="() => ds.Close()" />
+    </RadzenStack>);
+    }
+}

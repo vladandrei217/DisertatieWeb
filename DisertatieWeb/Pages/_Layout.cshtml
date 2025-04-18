@@ -14,6 +14,8 @@
     <link href="DisertatieWeb.styles.css" rel="stylesheet" />
     <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
     <component type="typeof(RadzenTheme)" render-mode="ServerPrerendered" param-Theme="@("material")" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body>
     @RenderBody()
@@ -31,5 +33,6 @@
 
     <script src="_framework/blazor.server.js"></script>
     <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
+    <script src="~/mapa.js"></script>
 </body>
 </html>

@@ -1,0 +1,91 @@
+﻿@page "/intersectii"
+@using DisertatieWeb.Models
+@using DisertatieWeb.Pages.Components
+
+<PageTitle>Monitorizare Intersecții și Senzori</PageTitle>
+
+<h3 class="rz-mb-3">Monitorizare Intersecții și Senzori</h3>
+
+<RadzenRow>
+    <RadzenColumn Size="12" SizeMd="4">
+        <RadzenCard>
+            <RadzenDropDown Data="@senzori" TextProperty="Nume" ValueProperty="Id"
+            @bind-Value="@senzorSelectatId"
+            Change="@OnSenzorSelectatChanged"
+            Placeholder="Selectează un senzor" Style="width: 100%;" />
+            @if (senzorSelectat != null)
+            {
+                <RadzenCard Style="margin-top: 20px">
+                    <h3>@senzorSelectat.Nume</h3>
+                    <p><strong>Coordonate:</strong> @senzorSelectat.Latitudine, @senzorSelectat.Longitudine</p>
+                    <RadzenDataList Data="@senzorSelectat.Comentarii" TItem="ComentariuSenzor" Style="max-height: 300px; overflow-y: auto;">
+                        <Template Context="comentariu">
+                            <div class="rz-mb-2">
+                                <strong>@comentariu.Autor</strong> (@comentariu.Data.ToShortDateString()):
+                                <br />
+                                <em>@comentariu.Text</em>
+                            </div>
+                        </Template>
+                    </RadzenDataList>
+                </RadzenCard>
+            }
+        </RadzenCard>
+    </RadzenColumn>
+
+    <RadzenColumn Size="12" SizeMd="8">
+        <RadzenCard>
+            <MapaInterese Senzori="@senzori" OnSenzorSelectat="SelecteazaSenzor" />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    List<SenzorTrafic> senzori = new();
+    int senzorSelectatId;
+    SenzorTrafic senzorSelectat;
+
+    protected override void OnInitialized()
+    {
+        senzori = new List<SenzorTrafic>
+        {
+            new SenzorTrafic
+            {
+                Id = 1,
+                Nume = "Senzor Piața Victoriei",
+                Latitudine = 44.4545,
+                Longitudine = 26.0999,
+                Status = "Activ",
+                Comentarii = new List<ComentariuSenzor>
+                {
+                    new ComentariuSenzor { Id = 1, Data = DateTime.Now.AddDays(-2), Autor = "Admin", Text = "Senzor verificat manual." },
+                    new ComentariuSenzor { Id = 2, Data = DateTime.Now.AddDays(-1), Autor = "Ioana", Text = "Datele par inconsistente la orele de vârf." }
+                }
+            },
+            new SenzorTrafic
+            {
+                Id = 2,
+                Nume = "Senzor Bd. Unirii",
+                Latitudine = 44.4268,
+                Longitudine = 26.1025,
+                Status = "Alertă",
+                Comentarii = new List<ComentariuSenzor>
+                {
+                    new ComentariuSenzor { Id = 3, Data = DateTime.Now.AddHours(-10), Autor = "Mihai", Text = "Emite semnal intermitent." }
+                }
+            }
+        };
+
+        senzorSelectatId = senzori.First().Id;
+        senzorSelectat = senzori.First();
+    }
+
+    void OnSenzorSelectatChanged(object value)
+    {
+        senzorSelectatId = (int)value;
+        senzorSelectat = senzori.FirstOrDefault(s => s.Id == senzorSelectatId);
+    }
+    async Task SelecteazaSenzor(int senzorId)
+    {
+        senzorSelectat = senzori.FirstOrDefault(s => s.Id == senzorId);
+    }
+}

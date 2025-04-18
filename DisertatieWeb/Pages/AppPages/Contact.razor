@@ -1,0 +1,77 @@
+﻿@page "/contact"
+@using Radzen
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+
+<PageTitle>Contact</PageTitle>
+
+<RadzenSplitter Orientation="Orientation.Vertical" Collapse=@OnCollapse Expand=@OnExpand style="height: 100vh; border: 1px solid rgba(0,0,0,.08);">
+    <!-- Panou pentru meniul de navigare -->
+    <RadzenSplitterPane Size="250px" Min="150px" Max="400px">
+        <RadzenPanelMenu Style="height: 100%; overflow-y: auto;">
+            <RadzenPanelMenuItem Text="Contact" Icon="contact_support" Path="#contact" />
+        </RadzenPanelMenu>
+    </RadzenSplitterPane>
+
+    <!-- Panou pentru formularul de contact -->
+    <RadzenSplitterPane>
+        <div style="padding: 20px;">
+            <h3>Contactează-ne</h3>
+            <p>Completează formularul de mai jos și vom răspunde cât mai curând posibil:</p>
+
+            <EditForm Model="@formData" OnValidSubmit="SendMessage" Style="max-width: 600px;">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <RadzenTextBox Name="name" @bind-Value="formData.Name" Placeholder="Numele tău" Style="width: 100%;" />
+                <RadzenTextBox Name="email" @bind-Value="formData.Email" Placeholder="Email-ul tău" Style="width: 100%;" Type="email" />
+                <RadzenTextBox Name="subject" @bind-Value="formData.Subject" Placeholder="Subiectul mesajului" Style="width: 100%;" />
+                <RadzenTextArea Name="message" @bind-Value="formData.Message" Placeholder="Mesajul tău" Rows="5" Style="width: 100%;" />
+
+                <RadzenButton Text="Trimite" ButtonStyle="ButtonStyle.Primary" Type="submit" Style="margin-top: 20px;" />
+            </EditForm>
+        </div>
+    </RadzenSplitterPane>
+</RadzenSplitter>
+
+@code {
+
+    // Modelul de date pentru formularul de contact
+    private ContactFormModel formData = new ContactFormModel();
+
+    // Metoda de trimitere a mesajului
+    private void SendMessage()
+    {
+        //console.Log($"Mesaj trimis de {formData.Name} la {formData.Email} cu subiectul: {formData.Subject}");
+
+        // Resetează formularul după trimitere
+        formData = new ContactFormModel();
+    }
+
+    // Evenimente de colaps și extindere pentru panouri
+    void OnCollapse(RadzenSplitterEventArgs args)
+    {
+        //console.Log($"Pane {args.PaneIndex} Collapse");
+    }
+
+    void OnExpand(RadzenSplitterEventArgs args)
+    {
+        //console.Log($"Pane {args.PaneIndex} Expand");
+    }
+
+    // Modelul de date pentru formularul de contact
+    public class ContactFormModel
+    {
+        [Required(ErrorMessage = "Numele este obligatoriu.")]
+        public string Name { get; set; }
+
+        [Required(ErrorMessage = "Email-ul este obligatoriu.")]
+        [EmailAddress(ErrorMessage = "Email invalid.")]
+        public string Email { get; set; }
+
+        public string Subject { get; set; }
+
+        [Required(ErrorMessage = "Mesajul este obligatoriu.")]
+        public string Message { get; set; }
+    }
+}
