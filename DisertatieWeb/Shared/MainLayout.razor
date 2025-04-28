@@ -1,68 +1,108 @@
-﻿@inherits LayoutComponentBase
+﻿@using DisertatieWeb.Shared.Services
+@inherits LayoutComponentBase
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthService
 
 <RadzenComponents />
 <RadzenDialog/>
 <PageTitle>Bun venit!</PageTitle>
 
+
 <div class="page">
-    <div class="sidebar">
-        @* <NavMenu /> *@
-        <RadzenSidebar Style="background-color: #ffffff; border-right: 1px solid #e0e0e0; height: 100%;">
-        <RadzenPanelMenu Click="OnParentClicked" Multiple="@multiple">
+    @if (AuthService.IsAuthenticated)
+    {
+        <div class="sidebar">
+            @* <NavMenu /> *@
+            <RadzenSidebar Style="background-color: #ffffff; border-right: 1px solid #e0e0e0; height: 100%;">
+                <RadzenPanelMenu Click="OnParentClicked" Multiple="@multiple">
 
-            <RadzenPanelMenuItem Text="Dashboard" Icon="dashboard">
-                <RadzenPanelMenuItem Text="Statistici Generale" Path="dashboard" Icon="insights"></RadzenPanelMenuItem>
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Dashboard" Icon="dashboard">
+                        <RadzenPanelMenuItem Text="Statistici Generale" Path="dashboard" Icon="insights"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
 
-            <RadzenPanelMenuItem Text="Monitorizare Trafic" Icon="traffic">
-                <RadzenPanelMenuItem Text="Hărți Intersecții" Path="intersectii" Icon="map"></RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Fluxuri de Trafic" Path="fluxuri" Icon="timeline"></RadzenPanelMenuItem>
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Monitorizare Trafic" Icon="traffic">
+                        <RadzenPanelMenuItem Text="Hărți Intersecții" Path="intersectii" Icon="map"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Fluxuri de Trafic" Path="fluxuri" Icon="timeline"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
 
-            <RadzenPanelMenuItem Text="Senzori" Icon="sensors">
-                <RadzenPanelMenuItem Text="Status Senzori" Path="senzori-status" Icon="wifi"></RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Configurare" Path="senzori-config" Icon="settings_input_antenna"></RadzenPanelMenuItem>
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Senzori" Icon="sensors">
+                        <RadzenPanelMenuItem Text="Status Senzori" Path="senzori-status" Icon="wifi"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Configurare" Path="senzori-config" Icon="settings_input_antenna"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
 
-            <RadzenPanelMenuItem Text="Turism Inteligent" Icon="explore">
-                <RadzenPanelMenuItem Text="Flux Vizitatori" Path="flux-vizitatori" Icon="timeline" />
-                <RadzenPanelMenuItem Text="Zone Populare" Path="zone-populare" Icon="place" />
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Turism Inteligent" Icon="explore">
+                        <RadzenPanelMenuItem Text="Flux Vizitatori" Path="flux-vizitatori" Icon="timeline" />
+                        <RadzenPanelMenuItem Text="Zone Populare" Path="zone-populare" Icon="place" />
+                    </RadzenPanelMenuItem>
 
-            <RadzenPanelMenuItem Text="Puncte de Interes" Icon="location_on">
-                <RadzenPanelMenuItem Text="Lista Locații" Path="puncte-interes" Icon="map" />
-                <RadzenPanelMenuItem Text="Interacțiuni Senzori" Path="interactiuni-senzori" Icon="sensors" />
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Puncte de Interes" Icon="location_on">
+                        <RadzenPanelMenuItem Text="Lista Locații" Path="puncte-interes" Icon="map" />
+                        <RadzenPanelMenuItem Text="Interacțiuni Senzori" Path="interactiuni-senzori" Icon="sensors" />
+                    </RadzenPanelMenuItem>
 
-            <RadzenPanelMenuItem Text="Administrare" Icon="admin_panel_settings">
-                <RadzenPanelMenuItem Text="Utilizatori" Path="utilizatori" Icon="group"></RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Setări" Path="setari" Icon="settings"></RadzenPanelMenuItem>
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Administrare" Icon="admin_panel_settings">
+                        <RadzenPanelMenuItem Text="Utilizatori" Path="utilizatori" Icon="group"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Setări" Path="setari" Icon="settings"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
 
-            <RadzenPanelMenuItem Text="Ajutor" Icon="help_outline">
-                <RadzenPanelMenuItem Text="Documentație" Path="documentatie" Icon="menu_book"></RadzenPanelMenuItem>
-                <RadzenPanelMenuItem Text="Contact" Path="contact" Icon="contact_support"></RadzenPanelMenuItem>
-            </RadzenPanelMenuItem>
+                    <RadzenPanelMenuItem Text="Ajutor" Icon="help_outline">
+                        <RadzenPanelMenuItem Text="Documentație" Path="documentatie" Icon="menu_book"></RadzenPanelMenuItem>
+                        <RadzenPanelMenuItem Text="Contact" Path="contact" Icon="contact_support"></RadzenPanelMenuItem>
+                    </RadzenPanelMenuItem>
 
-        </RadzenPanelMenu>
-    </RadzenSidebar>
-    </div>
+                </RadzenPanelMenu>
+            </RadzenSidebar>
+        </div>
+    }
+
 
     <main>
-        @* <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div> *@
-
-        
+        @if (AuthService.IsAuthenticated)
+        {
+            <div style="background-color: #2196f3; color: white; padding: 1rem; border-bottom: 1px solid #1976d2; display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 18px;">
+                    Bine ai venit, <strong>@AuthService.Username</strong>!
+                </div>
+                <RadzenButton Text="Logout" ButtonStyle="ButtonStyle.Light" Click="Logout" Style="background:white; color: #2196f3;" />
+            </div>
+        }
+        else
+        {
+            @if (NavigationManager.Uri != NavigationManager.BaseUri + "login")
+            {
+                try
+                {
+                    NavigationManager.NavigateTo("/login", true);
+                }
+                catch { }
+            }
+        }
 
         <article class="content px-4">
             @Body
         </article>
     </main>
+
+
 </div>
 
 @code {
     bool multiple = true;
+    protected override void OnInitialized()
+    {
+        AuthService.OnChange += StateHasChanged;
+    }
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavigationManager.NavigateTo("/login");
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnChange -= StateHasChanged;
+    }
 
     void OnParentClicked(MenuItemEventArgs args)
     {

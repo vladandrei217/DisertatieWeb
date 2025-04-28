@@ -1,0 +1,56 @@
+﻿@page "/register"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Înregistrare</PageTitle>
+
+<div class="register-container" style="min-height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #f5f5f5;">
+    <RadzenCard Style="width: 450px; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+        <div class="text-center mb-4">
+            <RadzenIcon Icon="person_add" Style="font-size: 48px; color: #4caf50;" />
+            <h3>Creare Cont Nou</h3>
+        </div>
+
+        <RadzenTemplateForm Data="@newUser" TItem="RegisterModel" Submit="@OnRegister" Style="display:flex; flex-direction: column; gap: 1rem;">
+            <RadzenTextBox @bind-Value="newUser.NumeComplet" Name="NumeComplet" Placeholder="Nume complet" Style="width: 100%;" />
+            <RadzenTextBox @bind-Value="newUser.Email" Name="Email" Placeholder="Adresă Email" Style="width: 100%;" />
+            <RadzenTextBox @bind-Value="newUser.Username" Name="Username" Placeholder="Nume utilizator" Style="width: 100%;" />
+            <RadzenPassword @bind-Value="newUser.Parola" Name="Parola" Placeholder="Parolă" Style="width: 100%;" />
+            <RadzenPassword @bind-Value="newUser.ConfirmareParola" Name="ConfirmareParola" Placeholder="Confirmă parola" Style="width: 100%;" />
+
+            <RadzenButton Text="Înregistrează-te" ButtonStyle="ButtonStyle.Primary" Style="width: 100%;" />
+        </RadzenTemplateForm>
+
+        <div class="text-center mt-3">
+            <RadzenButton Text="Înapoi la Autentificare" ButtonStyle="ButtonStyle.Light" Click="NavigheazaLaLogin" Style="font-size: 14px;" />
+        </div>
+    </RadzenCard>
+</div>
+
+@code {
+    private RegisterModel newUser = new();
+
+    private async Task OnRegister(object model)
+    {
+        var user = model as RegisterModel;
+        if (user != null)
+        {
+            Console.WriteLine($"Utilizator înregistrat: {user.Username} - {user.Email}");
+            await Task.Delay(300);
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+
+    private void NavigheazaLaLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+
+    public class RegisterModel
+    {
+        public string NumeComplet { get; set; }
+        public string Email { get; set; }
+        public string Username { get; set; }
+        public string Parola { get; set; }
+        public string ConfirmareParola { get; set; }
+    }
+}

@@ -1,0 +1,51 @@
+﻿@page "/login"
+@using DisertatieWeb.Shared.Services
+@inject NavigationManager NavigationManager
+@inject AuthenticationService AuthService
+
+<PageTitle>Autentificare</PageTitle>
+
+<div class="login-container" style="min-height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #f5f5f5;">
+    <RadzenCard Style="width: 400px; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+        <div class="text-center mb-4">
+            <RadzenIcon Icon="account_circle" Style="font-size: 48px; color: #2196f3;" />
+            <h3>Autentificare Utilizator</h3>
+        </div>
+
+        <RadzenTemplateForm Data="@userLogin" TItem="UserLoginModel" Submit="@OnLogin" Style="display:flex; flex-direction: column; gap: 1rem;">
+            <RadzenTextBox @bind-Value="userLogin.Username" Name="Username" Placeholder="Nume utilizator" Style="width: 100%;" />
+            <RadzenPassword @bind-Value="userLogin.Password" Name="Password" Placeholder="Parolă" Style="width: 100%;" />
+
+            <RadzenButton Text="Autentificare" ButtonStyle="ButtonStyle.Primary" Style="width: 100%;" ButtonType="ButtonType.Submit" />
+        </RadzenTemplateForm>
+
+        <div class="text-center mt-3">
+            <RadzenButton Text="Cont nou" ButtonStyle="ButtonStyle.Light" Click="NavigheazaLaInregistrare" Style="font-size: 14px;" />
+        </div>
+    </RadzenCard>
+</div>
+
+@code {
+    private UserLoginModel userLogin = new();
+
+    private async Task OnLogin(UserLoginModel model)
+    {
+        if (!string.IsNullOrEmpty(userLogin.Username) && !string.IsNullOrEmpty(userLogin.Password))
+        {
+            await AuthService.LoginAsync(userLogin.Username);
+
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private void NavigheazaLaInregistrare()
+    {
+        NavigationManager.NavigateTo("/register"); // Vei crea o pagină de înregistrare dacă dorești
+    }
+
+    public class UserLoginModel
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+}
