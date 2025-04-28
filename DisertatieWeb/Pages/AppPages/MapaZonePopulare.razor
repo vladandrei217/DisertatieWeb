@@ -1,0 +1,16 @@
+﻿@using DisertatieWeb.Models
+<div id="zoneMap" style="height: 400px; width: 100%; border-radius: 8px;"></div>
+
+@code {
+    [Parameter] public List<ZonaPopularaModel> ZonePopulare { get; set; } = new();
+
+    [Inject] IJSRuntime JS { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("initZoneMap", ZonePopulare);
+        }
+    }
+}

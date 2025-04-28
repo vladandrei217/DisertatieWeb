@@ -1,0 +1,41 @@
+﻿@page "/zone-populare"
+@using DisertatieWeb.Models
+@inject NotificationService NotificationService
+
+<PageTitle>Zone Populare</PageTitle>
+
+<RadzenCard Style="margin:2rem;">
+    <h3>Top Zone Turistice Vizitate</h3>
+
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMd="6">
+            <RadzenDataGrid TItem="ZonaPopularaModel" Data="@zonePopulare" AllowPaging="true" PageSize="5" AllowSorting="true">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ZonaPopularaModel" Property="NumeZona" Title="Zonă" />
+                    <RadzenDataGridColumn TItem="ZonaPopularaModel" Property="Vizitatori" Title="Număr Vizitatori" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMd="6">
+            <RadzenCard>
+                <MapaZonePopulare ZonePopulare="@zonePopulare" />
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    private List<ZonaPopularaModel> zonePopulare = new();
+
+    protected override void OnInitialized()
+    {
+        zonePopulare = new List<ZonaPopularaModel>
+        {
+            new ZonaPopularaModel { Id = 1, NumeZona = "Piața Unirii", Vizitatori = 1450, Latitudine = 44.4268, Longitudine = 26.1025 },
+            new ZonaPopularaModel { Id = 2, NumeZona = "Ateneul Român", Vizitatori = 890, Latitudine = 44.4412, Longitudine = 26.0975 },
+            new ZonaPopularaModel { Id = 3, NumeZona = "Calea Victoriei", Vizitatori = 2200, Latitudine = 44.4387, Longitudine = 26.0963 },
+            new ZonaPopularaModel { Id = 4, NumeZona = "Parcul Herăstrău", Vizitatori = 3120, Latitudine = 44.4761, Longitudine = 26.0781 }
+        };
+    }
+}

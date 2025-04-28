@@ -1,0 +1,42 @@
+﻿@page "/interactiuni-senzori"
+@using DisertatieWeb.Models
+
+<PageTitle>Interacțiuni Senzori</PageTitle>
+
+<RadzenCard Style="margin:2rem;">
+    <h3>Configurare Interacțiuni Puncte de Interes</h3>
+
+    <RadzenDataGrid TItem="InteractiuneSenzorModel" Data="@interactiuni" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single">
+        <Columns>
+            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="PunctDeInteres" Title="Punct de Interes" />
+            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="NotificareTrimisa" Title="Trimite Notificare" >
+                <EditTemplate Context="interactiune">
+                    <RadzenCheckBox @bind-Value="interactiune.NotificareTrimisa" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="ActivareLumini" Title="Activează Lumini" >
+                <EditTemplate Context="interactiune">
+                    <RadzenCheckBox @bind-Value="interactiune.ActivareLumini" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="RedareMesajAudio" Title="Redă Mesaj Audio" >
+                <EditTemplate Context="interactiune">
+                    <RadzenCheckBox @bind-Value="interactiune.RedareMesajAudio" />
+                </EditTemplate>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    private List<InteractiuneSenzorModel> interactiuni = new();
+
+    protected override void OnInitialized()
+    {
+        interactiuni = new List<InteractiuneSenzorModel>
+        {
+            new InteractiuneSenzorModel { Id = 1, PunctDeInteres = "Ateneul Român", NotificareTrimisa = true, ActivareLumini = true, RedareMesajAudio = false },
+            new InteractiuneSenzorModel { Id = 2, PunctDeInteres = "Piața Unirii", NotificareTrimisa = true, ActivareLumini = false, RedareMesajAudio = true }
+        };
+    }
+}

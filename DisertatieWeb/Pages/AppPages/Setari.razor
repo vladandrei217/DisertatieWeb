@@ -3,16 +3,14 @@
 @inject NotificationService NotificationService
 
 <RadzenCard Style="margin: 2rem">
-    <RadzenTabs Visible="true">
-        <RadzenTabsItem Visible="true" Text="General">
-            <div class="p-3 space-y-4">
-                <RadzenFieldset Text="Informații Aplicație">
-                    <RadzenTextBox @bind-Value="appName" Placeholder="Nume aplicație" Style="width: 300px;" />
-                    <RadzenTextBox @bind-Value="appDescription" Placeholder="Descriere" Style="width: 500px;" />
-                    <div class="mt-2 d-flex align-items-center">
-                        <RadzenSwitch @bind-Value="maintenanceMode" />
-                        <label class="ms-2">Mod mentenanță activ</label>
-                    </div>
+    <RadzenTabs>
+       <Tabs>
+            <RadzenTabsItem Text="General">
+                <RadzenFieldset Text="Informații Aplicație" Style="margin-bottom: 1rem;">
+                    <RadzenTextBox @bind-Value="appName" Placeholder="Nume aplicație" Style="width: 300px; margin-bottom: 10px;" />
+                    <RadzenTextBox @bind-Value="appDescription" Placeholder="Descriere" Style="width: 500px; margin-bottom: 10px;" />
+                    <RadzenSwitch @bind-Value="maintenanceMode" Style="margin-top:10px;" />
+                    <label style="margin-left: 10px;">Mod mentenanță activ</label>
                 </RadzenFieldset>
 
                 <RadzenFieldset Text="Localizare">
@@ -21,56 +19,45 @@
                                     TextProperty="Name"
                                     ValueProperty="Code"
                                     Placeholder="Selectează limba"
-                                    Style="width: 300px;" />
+                                    Style="width: 300px; margin-bottom: 10px;" />
                     <RadzenDropDown @bind-Value="timezone"
                                     Data="@timezones"
                                     Placeholder="Selectează fus orar"
                                     Style="width: 300px;" />
                 </RadzenFieldset>
-            </div>
-        </RadzenTabsItem>
+            </RadzenTabsItem>
 
-        <RadzenTabsItem Text="Securitate">
-            <div class="p-3 space-y-4">
-                <RadzenFieldset Text="Parolă">
+            <RadzenTabsItem Text="Securitate">
+                <RadzenFieldset Text="Parolă" Style="margin-bottom: 1rem;">
                     <RadzenNumeric @bind-Value="minPasswordLength" Min="6" Max="20" Style="width: 150px;" />
-                    <label class="ms-3">Lungime minimă</label>
-
-                    <div class="mt-2 d-flex align-items-center">
-                        <RadzenSwitch @bind-Value="requireSpecialChar" />
-                        <label class="ms-2">Necesită caractere speciale</label>
-                    </div>
+                    <label style="margin-left: 10px;">Lungime minimă</label>
+                    <RadzenSwitch @bind-Value="requireSpecialChar" Style="margin-top:10px;" />
+                    <label style="margin-left: 10px;">Necesită caractere speciale</label>
                 </RadzenFieldset>
 
                 <RadzenFieldset Text="Autentificare">
                     <RadzenSwitch @bind-Value="enable2FA" />
-                    <label class="ms-2">Activează autentificare în doi pași (2FA)</label>
+                    <label style="margin-left: 10px;">Activează autentificare în doi pași (2FA)</label>
                 </RadzenFieldset>
-            </div>
-        </RadzenTabsItem>
+            </RadzenTabsItem>
 
-        <RadzenTabsItem Text="Notificări">
-            <div class="p-3 space-y-4">
-                <RadzenFieldset Text="Email">
-                    <RadzenTextBox @bind-Value="emailFrom" Placeholder="Adresa expeditor" Style="width: 300px;" />
-                    <div class="mt-2 d-flex align-items-center">
-                        <RadzenSwitch @bind-Value="emailNotifications" />
-                        <label class="ms-2">Activează notificări pe email</label>
-                    </div>
+            <RadzenTabsItem Text="Notificări">
+                <RadzenFieldset Text="Email" Style="margin-bottom: 1rem;">
+                    <RadzenTextBox @bind-Value="emailFrom" Placeholder="Adresa expeditor" Style="width: 300px; margin-bottom: 10px;" />
+                    <RadzenSwitch @bind-Value="emailNotifications" />
+                    <label style="margin-left: 10px;">Trimite notificări email</label>
                 </RadzenFieldset>
 
                 <RadzenFieldset Text="SMS">
-                    <RadzenTextBox @bind-Value="smsProviderApiKey" Placeholder="API Key Provider SMS" Style="width: 400px;" />
-                    <div class="mt-2 d-flex align-items-center">
-                        <RadzenSwitch @bind-Value="smsNotifications" />
-                        <label class="ms-2">Activează notificări SMS</label>
-                    </div>
+                    <RadzenTextBox @bind-Value="smsProviderApiKey" Placeholder="API Key Provider SMS" Style="width: 400px; margin-bottom: 10px;" />
+                    <RadzenSwitch @bind-Value="smsNotifications" />
+                    <label style="margin-left: 10px;">Activează notificări SMS</label>
                 </RadzenFieldset>
-            </div>
-        </RadzenTabsItem>
+            </RadzenTabsItem>
+       </Tabs>
     </RadzenTabs>
 
-    <div class="mt-4 d-flex">
+    <div style="margin-top: 20px;">
         <RadzenButton Text="Salvează Setări" Click="@SaveSettings" ButtonStyle="ButtonStyle.Primary" Style="margin-right: 1rem;" />
         <RadzenButton Text="Resetează" Click="@ResetSettings" ButtonStyle="ButtonStyle.Secondary" />
     </div>

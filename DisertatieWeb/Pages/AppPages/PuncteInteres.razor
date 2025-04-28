@@ -1,0 +1,33 @@
+﻿@page "/puncte-interes"
+@using DisertatieWeb.Models
+
+<PageTitle>Lista Puncte de Interes</PageTitle>
+
+<RadzenCard Style="margin:2rem;">
+    <h3>Puncte de Interes Turistic</h3>
+
+    <RadzenDataGrid TItem="PunctDeInteresModel" Data="@puncte" AllowPaging="true" PageSize="5" AllowSorting="true">
+        <Columns>
+            <RadzenDataGridColumn TItem="PunctDeInteresModel" Property="Nume" Title="Nume" />
+            <RadzenDataGridColumn TItem="PunctDeInteresModel" Property="Descriere" Title="Descriere" />
+            <RadzenDataGridColumn TItem="PunctDeInteresModel" Title="Imagine">
+                <Template Context="punct">
+                    <img src="@punct.ImagineUrl" alt="Imagine Locatie" width="80" style="border-radius:8px;" />
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    private List<PunctDeInteresModel> puncte = new();
+
+    protected override void OnInitialized()
+    {
+        puncte = new List<PunctDeInteresModel>
+        {
+            new PunctDeInteresModel { Id = 1, Nume = "Ateneul Român", Descriere = "Monument istoric și centru cultural", Latitudine = 44.4412, Longitudine = 26.0975, ImagineUrl = "https://upload.wikimedia.org/wikipedia/commons/3/37/Ateneul_Roman_Bucharest.jpg" },
+            new PunctDeInteresModel { Id = 2, Nume = "Piața Unirii", Descriere = "Cea mai mare piață din București", Latitudine = 44.4268, Longitudine = 26.1025, ImagineUrl = "https://upload.wikimedia.org/wikipedia/commons/d/d5/Piata_Unirii_Bucharest.jpg" }
+        };
+    }
+}

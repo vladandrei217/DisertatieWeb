@@ -1,0 +1,44 @@
+﻿@page "/flux-vizitatori"
+@using DisertatieWeb.Models
+@inject NotificationService NotificationService
+
+<PageTitle>Flux Vizitatori</PageTitle>
+
+<RadzenCard Style="margin:2rem;">
+    <h3>Monitorizare Flux Vizitatori</h3>
+
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeMd="6">
+            <RadzenDataGrid TItem="FluxVizitatoriModel" Data="@fluxuri" AllowPaging="true" PageSize="5" AllowSorting="true">
+                <Columns>
+                    <RadzenDataGridColumn TItem="FluxVizitatoriModel" Property="Locație" Title="Locație" />
+                    <RadzenDataGridColumn TItem="FluxVizitatoriModel" Property="NumarVizitatori" Title="Număr Vizitatori" />
+                    <RadzenDataGridColumn TItem="FluxVizitatoriModel" Property="OraRaportarii" Title="Ora Raportării" FormatString="{0:HH:mm}" />
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12" SizeMd="6">
+            <RadzenChart Style="height:400px">
+                <RadzenLineSeries Data="@fluxuri" CategoryProperty="Locație" ValueProperty="NumarVizitatori" Title="Număr Vizitatori" />
+                <RadzenCategoryAxis Padding="20" />
+                <RadzenValueAxis />
+            </RadzenChart>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenCard>
+
+@code {
+    private List<FluxVizitatoriModel> fluxuri = new();
+
+    protected override void OnInitialized()
+    {
+        fluxuri = new List<FluxVizitatoriModel>
+        {
+            new FluxVizitatoriModel { Locație = "Piața Unirii", NumarVizitatori = 132, OraRaportarii = DateTime.Now.AddMinutes(-15) },
+            new FluxVizitatoriModel { Locație = "Ateneul Român", NumarVizitatori = 87, OraRaportarii = DateTime.Now.AddMinutes(-10) },
+            new FluxVizitatoriModel { Locație = "Calea Victoriei", NumarVizitatori = 215, OraRaportarii = DateTime.Now.AddMinutes(-5) },
+            new FluxVizitatoriModel { Locație = "Parcul Herăstrău", NumarVizitatori = 320, OraRaportarii = DateTime.Now.AddMinutes(-2) }
+        };
+    }
+}
