@@ -1,5 +1,8 @@
 ﻿@page "/register"
+@using DisertatieWeb.Shared.Services
 @inject NavigationManager NavigationManager
+@inject AuthenticationService AuthService
+@inject IHttpClientFactory HttpClientFactory
 
 <PageTitle>Înregistrare</PageTitle>
 
@@ -17,7 +20,7 @@
             <RadzenPassword @bind-Value="newUser.Parola" Name="Parola" Placeholder="Parolă" Style="width: 100%;" />
             <RadzenPassword @bind-Value="newUser.ConfirmareParola" Name="ConfirmareParola" Placeholder="Confirmă parola" Style="width: 100%;" />
 
-            <RadzenButton Text="Înregistrează-te" ButtonStyle="ButtonStyle.Primary" Style="width: 100%;" />
+            <RadzenButton Text="Înregistrează-te" ButtonStyle="ButtonStyle.Primary" Style="width: 100%;" ButtonType="ButtonType.Submit" />
         </RadzenTemplateForm>
 
         <div class="text-center mt-3">
@@ -32,11 +35,29 @@
     private async Task OnRegister(object model)
     {
         var user = model as RegisterModel;
-        if (user != null)
+        if (user == null || user.Parola != user.ConfirmareParola)
+            return;
+
+        var registration = new
         {
-            Console.WriteLine($"Utilizator înregistrat: {user.Username} - {user.Email}");
-            await Task.Delay(300);
+            NumeComplet = newUser.NumeComplet,
+            Email = newUser.Email,
+            Username = newUser.Username,
+            Parola = newUser.Parola
+        };
+
+        var http = HttpClientFactory.CreateClient();
+        var response = await http.PostAsJsonAsync(NavigationManager.BaseUri + "api/auth/register", registration);
+
+        if (response.IsSuccessStatusCode)
+        {
             NavigationManager.NavigateTo("/login");
+            AuthService.RegisteringProcess = false;
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            Console.WriteLine($"Eroare la înregistrare: {error}");
         }
     }
 

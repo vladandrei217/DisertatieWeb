@@ -69,7 +69,7 @@
         }
         else
         {
-            @if (NavigationManager.Uri != NavigationManager.BaseUri + "login")
+            @if (NavigationManager.Uri != NavigationManager.BaseUri + "login" && !AuthService.RegisteringProcess)
             {
                 try
                 {

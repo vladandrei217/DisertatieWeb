@@ -3,6 +3,7 @@
     public class AuthenticationService
     {
         public bool IsAuthenticated { get; private set; } = false;
+        public bool RegisteringProcess { get; set; } = false;
         public string Username { get; private set; }
 
         public event Action OnChange;

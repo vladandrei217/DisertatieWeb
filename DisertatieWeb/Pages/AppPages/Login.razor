@@ -40,7 +40,8 @@
 
     private void NavigheazaLaInregistrare()
     {
-        NavigationManager.NavigateTo("/register"); // Vei crea o pagină de înregistrare dacă dorești
+        NavigationManager.NavigateTo("/register");
+        AuthService.RegisteringProcess = true;
     }
 
     public class UserLoginModel
