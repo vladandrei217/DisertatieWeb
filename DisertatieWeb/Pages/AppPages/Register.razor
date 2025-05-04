@@ -6,6 +6,11 @@
 
 <PageTitle>Înregistrare</PageTitle>
 
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
 <div class="register-container" style="min-height: 100vh; display: flex; justify-content: center; align-items: center; background-color: #f5f5f5;">
     <RadzenCard Style="width: 450px; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
         <div class="text-center mb-4">
@@ -31,12 +36,16 @@
 
 @code {
     private RegisterModel newUser = new();
+    private string? errorMessage;
 
     private async Task OnRegister(object model)
     {
         var user = model as RegisterModel;
         if (user == null || user.Parola != user.ConfirmareParola)
+        {
+            errorMessage = "Te rugăm să introduci nume utilizator și parolă.";
             return;
+        }
 
         var registration = new
         {

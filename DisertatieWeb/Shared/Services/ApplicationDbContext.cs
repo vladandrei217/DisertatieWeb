@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DisertatieWeb.Shared.Services
 {
@@ -32,8 +33,16 @@ namespace DisertatieWeb.Shared.Services
         public string Username { get; set; }
 
         [Required]
+        [Column("password_hash")] 
         public string PasswordHash { get; set; }
 
+        [Column("reset_token")]
+        public string? ResetToken { get; set; }
+
+        [Column("reset_expiry")]
+        public DateTime? ResetExpiry { get; set; }
+
+        [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

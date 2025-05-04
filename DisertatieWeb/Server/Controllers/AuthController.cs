@@ -16,8 +16,8 @@ namespace DisertatieWeb.Server.Controllers
         {
             _context = context;
         }
-
-        [HttpPost("register")]
+        [HttpPost]
+        [Route("register")]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             if (await _context.Users.AnyAsync(u => u.Email == model.Email))
@@ -37,6 +37,22 @@ namespace DisertatieWeb.Server.Controllers
 
             return Ok();
         }
+        [HttpPost]
+        [Route("login")]
+        public async Task<IActionResult> Login([FromBody] UserLoginModel model)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username);
+            if (user == null)
+                return Unauthorized("Nume utilizator invalid.");
+
+            var hasher = new PasswordHasher<User>();
+            var result = hasher.VerifyHashedPassword(user, user.PasswordHash, model.Password);
+
+            if (result == PasswordVerificationResult.Failed)
+                return Unauthorized("Parolă incorectă.");
+
+            return Ok(); 
+        }
 
         public class RegisterModel
         {
@@ -44,6 +60,11 @@ namespace DisertatieWeb.Server.Controllers
             public string Email { get; set; }
             public string Username { get; set; }
             public string Parola { get; set; }
+        }
+        public class UserLoginModel
+        {
+            public string Username { get; set; }
+            public string Password { get; set; }
         }
     }
 }
