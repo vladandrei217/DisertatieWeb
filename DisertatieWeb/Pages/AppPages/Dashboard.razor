@@ -1,5 +1,7 @@
 ﻿@page "/dashboard"
 @using DisertatieWeb.Models
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>Statistici Generale</PageTitle>
 
@@ -7,38 +9,42 @@
 
 <RadzenRow>
     <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
-        <h5>Vehicule active</h5>
-        <p>@stats?.VehiculeActive vehicule</p>
+        <h5>Dispozitive active</h5>
+        <p>@stats?.DispozitiveActive dispozitive</p>
     </RadzenCard>
     <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
-        <h5>Emisii CO₂</h5>
-        <p>@stats?.EmisiiCo2.ToString("0.00") kg</p>
+        <h5>Puncte turistice</h5>
+        <p>@stats?.PuncteTuristice puncte</p>
     </RadzenCard>
     <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
-        <h5>Alerte active</h5>
-        <p>@stats?.AlerteActive</p>
+        <h5>Total comentarii</h5>
+        <p>@stats?.ComentariiTotal comentarii</p>
     </RadzenCard>
     <RadzenCard Class="rz-col-12 rz-sm-6 rz-md-3 rz-mb-4">
-        <h5>Consum combustibil</h5>
-        <p>@stats?.ConsumCombustibil.ToString("0.00") L</p>
+        <h5>Dispozitive recente</h5>
+        <p>@stats?.DispozitiveRecente</p>
     </RadzenCard>
 </RadzenRow>
 
 <RadzenRow>
     <RadzenColumn Size="12" SizeMd="6">
         <RadzenCard>
-            <h5>Trafic Zilnic</h5>
-            <RadzenChart>
-                <RadzenLineSeries Data="@stats?.TraficZilnic" CategoryProperty="Data" ValueProperty="Vehicule" />
-                <RadzenCategoryAxis FormatString="dd/MM" />
-            </RadzenChart>
+            <h5>Comentarii Recente</h5>
+            <RadzenDataGrid Data="@stats?.ComentariiRecente" TItem="ComentariuRecent" ShowPagingSummary="true" PageSize="5">
+                <Columns>
+                    <RadzenDataGridColumn TItem="ComentariuRecent" Property="UserEmail" Title="Utilizator" />
+                    <RadzenDataGridColumn TItem="ComentariuRecent" Property="PunctInteres" Title="Punct de interes" />
+                    <RadzenDataGridColumn TItem="ComentariuRecent" Property="Data" Title="Dată" FormatString="{0:dd/MM/yyyy HH:mm}" />
+                    <RadzenDataGridColumn TItem="ComentariuRecent" Property="Continut" Title="Comentariu" />
+                </Columns>
+            </RadzenDataGrid>
         </RadzenCard>
     </RadzenColumn>
 
     <RadzenColumn Size="12" SizeMd="6">
         <RadzenCard>
-            <h5>Evenimente Recente</h5>
-            <RadzenDataGrid Data="@evenimenteRecente" TItem="EvenimentTrafic" ShowPagingSummary="true" PageSize="5">
+            <h5>Evenimente Sistem</h5>
+            <RadzenDataGrid Data="@evenimente" TItem="EvenimentTrafic" ShowPagingSummary="true" PageSize="5">
                 <Columns>
                     <RadzenDataGridColumn TItem="EvenimentTrafic" Property="Tip" Title="Tip" />
                     <RadzenDataGridColumn TItem="EvenimentTrafic" Property="Locatie" Title="Locație" />
@@ -50,37 +56,21 @@
 </RadzenRow>
 
 @code {
-    DashboardStats stats;
-    List<EvenimentTrafic> evenimenteRecente = new();
+    private DashboardStats? stats;
+    private List<EvenimentTrafic> evenimente = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Simulare date
-        stats = new DashboardStats
-            {
-                VehiculeActive = 328,
-                EmisiiCo2 = 712.45,
-                AlerteActive = 12,
-                ConsumCombustibil = 451.3,
-                TraficZilnic = Enumerable.Range(1, 7).Select(i => new DailyTraffic
-                {
-                    Data = DateTime.Today.AddDays(-i),
-                    Vehicule = new Random().Next(200, 500)
-                }).ToList()
-            };
+        var http = HttpClientFactory.CreateClient();
 
-        evenimenteRecente = new List<EvenimentTrafic>
+        try
         {
-            new() { Tip = "Accident", Locatie = "Bd. Republicii", Data = DateTime.Now.AddMinutes(-30) },
-            new() { Tip = "Blocaj", Locatie = "Str. Libertatii", Data = DateTime.Now.AddHours(-2) },
-            new() { Tip = "Semafor defect", Locatie = "Calea Victoriei", Data = DateTime.Now.AddHours(-4) }
-        };
-    }
-
-    public class EvenimentTrafic
-    {
-        public string Tip { get; set; }
-        public string Locatie { get; set; }
-        public DateTime Data { get; set; }
+            stats = await http.GetFromJsonAsync<DashboardStats>(NavigationManager.BaseUri + "api/dashboard/stats");
+            evenimente = await http.GetFromJsonAsync<List<EvenimentTrafic>>(NavigationManager.BaseUri + "api/dashboard/evenimente");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Eroare la încărcarea datelor dashboard: " + ex.Message);
+        }
     }
 }
