@@ -82,6 +82,10 @@
     {
         AuthService.OnChange += StateHasChanged;
 
+        // de eliminat
+        AuthService.LoginAsync("admin");
+        // --
+
         @if (NavigationManager.Uri != NavigationManager.BaseUri + "login" && !AuthService.RegisteringProcess)
         {
             try

@@ -162,6 +162,8 @@ namespace DisertatieWeb.Shared.Services
 
         [Column("status")]
         public string Status { get; set; }
+        [Column("detalii")]
+        public string Detalii { get; set; }
 
         public List<TrafficSensorComment> Comentarii { get; set; } = new();
     }

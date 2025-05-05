@@ -1,18 +1,19 @@
 ﻿@page "/senzori-status"
 @using DisertatieWeb.Models
 @using DisertatieWeb.Models.DisertatieWeb.Models
-@using Radzen
+@inject IHttpClientFactory HttpClientFactory
 @inject DialogService DialogService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Status Senzori</PageTitle>
 
 <h3>Statusul Senzorilor</h3>
 
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false"
-FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true"
-PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-Data="@senzori" ColumnWidth="250px" LogicalFilterOperator="LogicalFilterOperator.Or"
-SelectionMode="DataGridSelectionMode.Single">
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5"
+                AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true" Data="@senzori"
+                ColumnWidth="250px" SelectionMode="DataGridSelectionMode.Single">
     <Columns>
         <RadzenDataGridColumn TItem="Senzor" Property="Id" Title="ID" />
         <RadzenDataGridColumn TItem="Senzor" Property="Nume" Title="Nume" />
@@ -20,7 +21,7 @@ SelectionMode="DataGridSelectionMode.Single">
         <RadzenDataGridColumn TItem="Senzor" Context="senzor" Title="Detalii">
             <Template Context="senzor">
                 <RadzenButton Icon="info" Text="Detalii" ButtonStyle="ButtonStyle.Primary"
-                Click="() => ShowSenzorDetaliiDialog(senzor)" />
+                              Click="() => ShowSenzorDetaliiDialog(senzor)" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -30,20 +31,23 @@ SelectionMode="DataGridSelectionMode.Single">
     private List<Senzor> senzori = new();
     private Senzor senzorSelectat;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Simulăm datele pentru senzorii
-        senzori = new List<Senzor>();
-        senzori.Add(new Senzor(1, "Senzor 1", "Senzor activ", "monitorizează fluxul de trafic pe Bd. Unirii"));
-        senzori.Add(new Senzor(2, "Senzor 1", "Senzor activ", "Senzor inactiv din cauza problemelor tehnice"));
+        try
+        {
+            var http = HttpClientFactory.CreateClient();
+            senzori = await http.GetFromJsonAsync<List<Senzor>>(NavigationManager.BaseUri + "api/senzoriStatus");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Eroare la încărcarea senzorilor: " + ex.Message);
+        }
     }
 
-    // Funcția pentru a deschide dialogul cu detalii
     private async Task ShowSenzorDetaliiDialog(Senzor senzor)
     {
         senzorSelectat = senzor;
 
-        // Deschidem un dialog cu detaliile senzorului
         await DialogService.OpenAsync("Detalii Senzor", ds =>
     @<RadzenStack Gap="1.5rem">
         <p><b>@senzorSelectat.Nume</b> - Status: @senzorSelectat.Status</p>

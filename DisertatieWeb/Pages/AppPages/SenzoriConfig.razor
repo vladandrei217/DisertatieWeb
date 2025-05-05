@@ -1,19 +1,18 @@
 ﻿@page "/senzori-config"
 @using DisertatieWeb.Models
 @using DisertatieWeb.Models.DisertatieWeb.Models
-@using Radzen
-@inject IJSRuntime JS
+@inject IHttpClientFactory HttpClientFactory
 @inject DialogService DialogService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Configurare Senzori</PageTitle>
 
 <h3>Configurare Senzori</h3>
 
-<!-- Tabelul cu senzorii -->
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false"
-                FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true"
-                PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                Data="@senzori" ColumnWidth="250px" LogicalFilterOperator="LogicalFilterOperator.Or"
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true"
+                FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5"
+                AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true" Data="@senzori" ColumnWidth="250px"
                 SelectionMode="DataGridSelectionMode.Single">
     <Columns>
         <RadzenDataGridColumn TItem="Senzor" Property="Id" Title="ID" />
@@ -21,108 +20,57 @@
         <RadzenDataGridColumn TItem="Senzor" Property="Status" Title="Status" />
         <RadzenDataGridColumn TItem="Senzor" Context="senzor" Title="Configurații">
             <Template Context="senzor">
-                <RadzenButton Icon="settings" Text="Configurație" ButtonStyle="ButtonStyle.Primary"
+                <RadzenButton Icon="settings" Text="Configurație"
+                              ButtonStyle="ButtonStyle.Primary"
                               Click="() => ShowSenzorConfigDialog(senzor)" />
             </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
-<!-- Formular pentru configurarea senzorului -->
-@* <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Start" JustifyContent="JustifyContent.Start">
-    @if (senzorSelectat != null)
-    {
-        <RadzenTextBox @bind-Value="senzorSelectat.Nume" Placeholder="Nume Senzor" />
-        <RadzenDropDown @bind-Value="senzorSelectat.Status" Data="@statuses" TextProperty="Name" ValueProperty="Value" Placeholder="Selectează Status" />
-        <RadzenButton Text="Salvează Configurație" ButtonStyle="ButtonStyle.Primary" Click="SaveSenzorConfig" />
-    }
-</RadzenStack> *@
-
 @code {
     private List<Senzor> senzori = new();
     private Senzor senzorSelectat;
-    private List<StatusOption> statuses = new List<StatusOption>
+    private List<StatusOption> statuses = new()
         {
         new StatusOption { Value = "Activ", Name = "Activ" },
         new StatusOption { Value = "Inactiv", Name = "Inactiv" }
         };
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        try
-        {
-            // Inițializare senzori doar dacă DialogService nu este null
-            if (DialogService == null)
-            {
-                Console.WriteLine("DialogService nu este disponibil.");
-            }
-            else
-            {
-                // Simulăm senzorii din aplicație
-                senzori = new List<Senzor>
-                    {
-                    new Senzor { Id = 1, Nume = "Senzor 1", Status = "Activ" },
-                    new Senzor { Id = 2, Nume = "Senzor 2", Status = "Inactiv" }
-                    };
-                Console.WriteLine("Senzorii au fost inițializați.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Eroare la inițializarea componentelor: {ex.Message}");
-        }
+        var http = HttpClientFactory.CreateClient();
+        senzori = await http.GetFromJsonAsync<List<Senzor>>(NavigationManager.BaseUri + "api/senzoriConfig");
     }
 
     private async Task ShowSenzorConfigDialog(Senzor senzor)
     {
-        try
-        {
-            if (DialogService != null)
-            {
-                senzorSelectat = senzor;
-                Console.WriteLine($"Deschiderea dialogului pentru senzorul: {senzor.Nume}");
+        senzorSelectat = new Senzor
+                {
+                    Id = senzor.Id,
+                    Nume = senzor.Nume,
+                    Status = senzor.Status,
+                    Detalii = senzor.Detalii
+                };
 
-                await DialogService.OpenAsync("Configurație Senzor", ds =>
-    @<RadzenStack Gap="1.5rem">
+        await DialogService.OpenAsync("Configurație Senzor", ds =>
+    @<RadzenStack Gap="1rem">
         <RadzenTextBox @bind-Value="senzorSelectat.Nume" Placeholder="Nume Senzor" />
-        <RadzenDropDown @bind-Value="senzorSelectat.Status" Data="@statuses" TextProperty="Name" ValueProperty="Value" Placeholder="Selectează Status" />
-        <RadzenButton Text="Salvează Configurație" ButtonStyle="ButtonStyle.Primary" Click="() => SaveSenzorConfig()" />
+        <RadzenDropDown @bind-Value="senzorSelectat.Status" Data="@statuses"
+                        TextProperty="Name" ValueProperty="Value" Placeholder="Selectează Status" />
+        <RadzenTextArea @bind-Value="senzorSelectat.Detalii" Placeholder="Detalii" Style="width:100%" />
+        <RadzenButton Text="Salvează" ButtonStyle="ButtonStyle.Primary" Click="() => SaveSenzorConfig()" />
     </RadzenStack>);
-            }
-            else
-            {
-                Console.WriteLine("DialogService nu este disponibil atunci când încercăm să deschidem dialogul.");
-            }
-        }
-        catch (ObjectDisposedException ex)
-        {
-            Console.WriteLine($"Eroare: {ex.Message} - DialogService a fost eliminat.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Eroare neașteptată la deschiderea dialogului: {ex.Message}");
-        }
     }
 
     private async Task SaveSenzorConfig()
     {
-        try
-        {
-            if (senzorSelectat != null)
-            {
-                Console.WriteLine($"Senzorul {senzorSelectat.Nume} a fost configurat cu statusul {senzorSelectat.Status}");
-                // Închide dialogul după salvare
-                DialogService.Close();
-            }
-            else
-            {
-                Console.WriteLine("Senzorul selectat este null.");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Eroare la salvarea configurației senzorului: {ex.Message}");
-        }
+        var http = HttpClientFactory.CreateClient();
+        await http.PutAsJsonAsync(NavigationManager.BaseUri + $"api/senzoriConfig/{senzorSelectat.Id}", senzorSelectat);
+
+        // Refresh listă după salvare
+        senzori = await http.GetFromJsonAsync<List<Senzor>>(NavigationManager.BaseUri + "api/senzoriConfig");
+        DialogService.Close();
     }
 
     public class StatusOption
