@@ -15,6 +15,7 @@ namespace DisertatieWeb.Shared.Services
         public DbSet<TrafficSensorComment> TrafficSensorComments { get; set; }
         public DbSet<TrafficFlow> TrafficFlows { get; set; }
         public DbSet<TrafficFlowMeasurement> TrafficFlowMeasurements { get; set; }
+        public DbSet<VisitorFlow> VisitorFlows { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,6 +47,11 @@ namespace DisertatieWeb.Shared.Services
 
             modelBuilder.Entity<TrafficFlowMeasurement>()
                 .HasIndex(m => m.FlowId);
+
+            modelBuilder.Entity<VisitorFlow>()
+                .HasOne(v => v.PointOfInterest)
+                .WithMany()
+                .HasForeignKey(v => v.PoiId);
         }
     }
 
@@ -106,6 +112,8 @@ namespace DisertatieWeb.Shared.Services
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
+        [Column("vizitatori_total")]
+        public int VizitatoriTotal { get; set; }
     }
 
     public class Comment
@@ -207,5 +215,22 @@ namespace DisertatieWeb.Shared.Services
 
         [Column("ora")] public DateTime Ora { get; set; }
         [Column("valoare")] public int Valoare { get; set; }
+    }
+    [Table("visitor_flow")]
+    public class VisitorFlow
+    {
+        public int Id { get; set; }
+
+        [Column("poi_id")]
+        public int PoiId { get; set; }
+
+        [ForeignKey("PoiId")]
+        public PointOfInterest PointOfInterest { get; set; }
+
+        [Column("numar_vizitatori")]
+        public int NumarVizitatori { get; set; }
+
+        [Column("ora_raportarii")]
+        public DateTime OraRaportarii { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿@page "/zone-populare"
 @using DisertatieWeb.Models
-@inject NotificationService NotificationService
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>Zone Populare</PageTitle>
 
@@ -28,14 +29,9 @@
 @code {
     private List<ZonaPopularaModel> zonePopulare = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        zonePopulare = new List<ZonaPopularaModel>
-        {
-            new ZonaPopularaModel { Id = 1, NumeZona = "Piața Unirii", Vizitatori = 1450, Latitudine = 44.4268, Longitudine = 26.1025 },
-            new ZonaPopularaModel { Id = 2, NumeZona = "Ateneul Român", Vizitatori = 890, Latitudine = 44.4412, Longitudine = 26.0975 },
-            new ZonaPopularaModel { Id = 3, NumeZona = "Calea Victoriei", Vizitatori = 2200, Latitudine = 44.4387, Longitudine = 26.0963 },
-            new ZonaPopularaModel { Id = 4, NumeZona = "Parcul Herăstrău", Vizitatori = 3120, Latitudine = 44.4761, Longitudine = 26.0781 }
-        };
+        var http = HttpClientFactory.CreateClient();
+        zonePopulare = await http.GetFromJsonAsync<List<ZonaPopularaModel>>(NavigationManager.BaseUri + "api/zonepopulare");
     }
 }

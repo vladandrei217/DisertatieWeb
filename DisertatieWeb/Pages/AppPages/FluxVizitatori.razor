@@ -1,6 +1,7 @@
 ﻿@page "/flux-vizitatori"
 @using DisertatieWeb.Models
-@inject NotificationService NotificationService
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>Flux Vizitatori</PageTitle>
 
@@ -31,14 +32,9 @@
 @code {
     private List<FluxVizitatoriModel> fluxuri = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        fluxuri = new List<FluxVizitatoriModel>
-        {
-            new FluxVizitatoriModel { Locație = "Piața Unirii", NumarVizitatori = 132, OraRaportarii = DateTime.Now.AddMinutes(-15) },
-            new FluxVizitatoriModel { Locație = "Ateneul Român", NumarVizitatori = 87, OraRaportarii = DateTime.Now.AddMinutes(-10) },
-            new FluxVizitatoriModel { Locație = "Calea Victoriei", NumarVizitatori = 215, OraRaportarii = DateTime.Now.AddMinutes(-5) },
-            new FluxVizitatoriModel { Locație = "Parcul Herăstrău", NumarVizitatori = 320, OraRaportarii = DateTime.Now.AddMinutes(-2) }
-        };
+        var http = HttpClientFactory.CreateClient();
+        fluxuri = await http.GetFromJsonAsync<List<FluxVizitatoriModel>>(NavigationManager.BaseUri + "api/fluxvizitatori");
     }
 }
