@@ -11,7 +11,8 @@ namespace DisertatieWeb.Shared.Services
         public DbSet<PointOfInterest> Points_Of_Interest { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Event> Events { get; set; }
-
+        public DbSet<TrafficSensor> TrafficSensors { get; set; }
+        public DbSet<TrafficSensorComment> TrafficSensorComments { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,6 +30,11 @@ namespace DisertatieWeb.Shared.Services
                 .HasOne(c => c.PointOfInterest)
                 .WithMany()
                 .HasForeignKey(c => c.PoiId);
+
+            modelBuilder.Entity<TrafficSensorComment>()
+                .HasOne<TrafficSensor>()
+                .WithMany(s => s.Comentarii)
+                .HasForeignKey(c => c.SensorId);
         }
     }
 
@@ -127,5 +133,45 @@ namespace DisertatieWeb.Shared.Services
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; }
+    }
+    [Table("traffic_sensors")]
+    public class TrafficSensor
+    {
+        public int Id { get; set; }
+
+        [Required]
+        [Column("nume")]
+        public string Nume { get; set; }
+
+        [Column("latitudine")]
+        public double Latitudine { get; set; }
+
+        [Column("longitudine")]
+        public double Longitudine { get; set; }
+
+        [Column("status")]
+        public string Status { get; set; }
+
+        public List<TrafficSensorComment> Comentarii { get; set; } = new();
+    }
+    [Table("traffic_sensor_comments")]
+    public class TrafficSensorComment
+    {
+        public int Id { get; set; }
+
+        [Column("sensor_id")]
+        public int SensorId { get; set; }
+
+        [ForeignKey("SensorId")]
+        public TrafficSensor Sensor { get; set; }
+
+        [Column("autor")]
+        public string Autor { get; set; }
+
+        [Column("text")]
+        public string Text { get; set; }
+
+        [Column("data")]
+        public DateTime Data { get; set; } = DateTime.UtcNow;
     }
 }

@@ -67,17 +67,6 @@
                 <RadzenButton Text="Logout" ButtonStyle="ButtonStyle.Light" Click="Logout" Style="background:white; color: #2196f3;" />
             </div>
         }
-        else
-        {
-            @if (NavigationManager.Uri != NavigationManager.BaseUri + "login" && !AuthService.RegisteringProcess)
-            {
-                try
-                {
-                    NavigationManager.NavigateTo("/login", true);
-                }
-                catch { }
-            }
-        }
 
         <article class="content px-4">
             @Body
@@ -92,6 +81,15 @@
     protected override void OnInitialized()
     {
         AuthService.OnChange += StateHasChanged;
+
+        @if (NavigationManager.Uri != NavigationManager.BaseUri + "login" && !AuthService.RegisteringProcess)
+        {
+            try
+            {
+                NavigationManager.NavigateTo("/login", true);
+            }
+            catch { }
+        }
     }
     private async Task Logout()
     {

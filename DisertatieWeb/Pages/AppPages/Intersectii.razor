@@ -1,6 +1,8 @@
 ﻿@page "/intersectii"
 @using DisertatieWeb.Models
 @using DisertatieWeb.Pages.Components
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>Monitorizare Intersecții și Senzori</PageTitle>
 
@@ -10,14 +12,15 @@
     <RadzenColumn Size="12" SizeMd="4">
         <RadzenCard>
             <RadzenDropDown Data="@senzori" TextProperty="Nume" ValueProperty="Id"
-            @bind-Value="@senzorSelectatId"
-            Change="@OnSenzorSelectatChanged"
-            Placeholder="Selectează un senzor" Style="width: 100%;" />
+                            @bind-Value="@senzorSelectatId"
+                            Change="@OnSenzorSelectatChanged"
+                            Placeholder="Selectează un senzor" Style="width: 100%;" />
             @if (senzorSelectat != null)
             {
                 <RadzenCard Style="margin-top: 20px">
                     <h3>@senzorSelectat.Nume</h3>
                     <p><strong>Coordonate:</strong> @senzorSelectat.Latitudine, @senzorSelectat.Longitudine</p>
+                    <p><strong>Status:</strong> @senzorSelectat.Status</p>
                     <RadzenDataList Data="@senzorSelectat.Comentarii" TItem="ComentariuSenzor" Style="max-height: 300px; overflow-y: auto;">
                         <Template Context="comentariu">
                             <div class="rz-mb-2">
@@ -44,39 +47,16 @@
     int senzorSelectatId;
     SenzorTrafic senzorSelectat;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        senzori = new List<SenzorTrafic>
-        {
-            new SenzorTrafic
-            {
-                Id = 1,
-                Nume = "Senzor Piața Victoriei",
-                Latitudine = 44.4545,
-                Longitudine = 26.0999,
-                Status = "Activ",
-                Comentarii = new List<ComentariuSenzor>
-                {
-                    new ComentariuSenzor { Id = 1, Data = DateTime.Now.AddDays(-2), Autor = "Admin", Text = "Senzor verificat manual." },
-                    new ComentariuSenzor { Id = 2, Data = DateTime.Now.AddDays(-1), Autor = "Ioana", Text = "Datele par inconsistente la orele de vârf." }
-                }
-            },
-            new SenzorTrafic
-            {
-                Id = 2,
-                Nume = "Senzor Bd. Unirii",
-                Latitudine = 44.4268,
-                Longitudine = 26.1025,
-                Status = "Alertă",
-                Comentarii = new List<ComentariuSenzor>
-                {
-                    new ComentariuSenzor { Id = 3, Data = DateTime.Now.AddHours(-10), Autor = "Mihai", Text = "Emite semnal intermitent." }
-                }
-            }
-        };
+        var http = HttpClientFactory.CreateClient();
+        senzori = await http.GetFromJsonAsync<List<SenzorTrafic>>(NavigationManager.BaseUri + "api/senzori");
 
-        senzorSelectatId = senzori.First().Id;
-        senzorSelectat = senzori.First();
+        if (senzori.Any())
+        {
+            senzorSelectatId = senzori.First().Id;
+            senzorSelectat = senzori.First();
+        }
     }
 
     void OnSenzorSelectatChanged(object value)
@@ -84,6 +64,7 @@
         senzorSelectatId = (int)value;
         senzorSelectat = senzori.FirstOrDefault(s => s.Id == senzorSelectatId);
     }
+
     async Task SelecteazaSenzor(int senzorId)
     {
         senzorSelectat = senzori.FirstOrDefault(s => s.Id == senzorId);
