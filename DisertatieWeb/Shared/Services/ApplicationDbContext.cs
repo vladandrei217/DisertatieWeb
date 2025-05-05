@@ -13,6 +13,8 @@ namespace DisertatieWeb.Shared.Services
         public DbSet<Event> Events { get; set; }
         public DbSet<TrafficSensor> TrafficSensors { get; set; }
         public DbSet<TrafficSensorComment> TrafficSensorComments { get; set; }
+        public DbSet<TrafficFlow> TrafficFlows { get; set; }
+        public DbSet<TrafficFlowMeasurement> TrafficFlowMeasurements { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -35,6 +37,15 @@ namespace DisertatieWeb.Shared.Services
                 .HasOne<TrafficSensor>()
                 .WithMany(s => s.Comentarii)
                 .HasForeignKey(c => c.SensorId);
+
+            modelBuilder.Entity<TrafficFlow>()
+                .HasMany(f => f.Masuratori)
+                .WithOne(m => m.Flow)
+                .HasForeignKey(m => m.FlowId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<TrafficFlowMeasurement>()
+                .HasIndex(m => m.FlowId);
         }
     }
 
@@ -173,5 +184,26 @@ namespace DisertatieWeb.Shared.Services
 
         [Column("data")]
         public DateTime Data { get; set; } = DateTime.UtcNow;
+    }
+    [Table("traffic_flows")]
+    public class TrafficFlow
+    {
+        public int Id { get; set; }
+        [Column("nume")] public string Nume { get; set; }
+        [Column("descriere")] public string Descriere { get; set; }
+        [Column("data_ultimei_actualizari")] public DateTime DataUltimeiActualizari { get; set; }
+
+        public List<TrafficFlowMeasurement> Masuratori { get; set; } = new();
+    }
+
+    [Table("traffic_flow_measurements")]
+    public class TrafficFlowMeasurement
+    {
+        public int Id { get; set; }
+        [Column("flow_id")] public int FlowId { get; set; }
+        [ForeignKey("FlowId")] public TrafficFlow Flow { get; set; }
+
+        [Column("ora")] public DateTime Ora { get; set; }
+        [Column("valoare")] public int Valoare { get; set; }
     }
 }

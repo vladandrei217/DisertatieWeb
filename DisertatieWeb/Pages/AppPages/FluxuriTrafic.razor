@@ -1,7 +1,9 @@
 ﻿@page "/fluxuri"
 @using DisertatieWeb.Models
 @using Radzen
+@inject IHttpClientFactory HttpClientFactory
 @inject DialogService DialogService
+@inject NavigationManager NavigationManager
 
 <PageTitle>Fluxuri de Trafic</PageTitle>
 
@@ -30,41 +32,19 @@
     private List<FluxTrafic> fluxuri = new();
     private FluxTrafic fluxSelectat;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // Simulăm datele pentru fluxurile de trafic
-        fluxuri = new List<FluxTrafic>
-            {
-            new FluxTrafic
-            {
-                Id = 1,
-                Nume = "Flux Piața Victoriei - Bd. Unirii",
-                Descriere = "Măsurători trafic pe traseul Piața Victoriei - Bd. Unirii",
-                DataUltimeiActualizari = DateTime.Now.AddMinutes(-30),
-                Detalii = new List<FluxTraficDetalii>
-                {
-                    new FluxTraficDetalii { Id = 1, Ora = DateTime.Now.AddMinutes(-30), Valoare = 150 },
-                    new FluxTraficDetalii { Id = 2, Ora = DateTime.Now.AddMinutes(-15), Valoare = 200 },
-                    new FluxTraficDetalii { Id = 3, Ora = DateTime.Now, Valoare = 180 }
-                }
-            },
-            new FluxTrafic
-            {
-                Id = 2,
-                Nume = "Flux Bd. Unirii - Piața Universității",
-                Descriere = "Măsurători trafic pe Bd. Unirii",
-                DataUltimeiActualizari = DateTime.Now.AddMinutes(-45),
-                Detalii = new List<FluxTraficDetalii>
-                {
-                    new FluxTraficDetalii { Id = 1, Ora = DateTime.Now.AddMinutes(-45), Valoare = 100 },
-                    new FluxTraficDetalii { Id = 2, Ora = DateTime.Now.AddMinutes(-20), Valoare = 120 },
-                    new FluxTraficDetalii { Id = 3, Ora = DateTime.Now.AddMinutes(-5), Valoare = 90 }
-                }
-            }
-            };
+        try
+        {
+            var http = HttpClientFactory.CreateClient();
+            fluxuri = await http.GetFromJsonAsync<List<FluxTrafic>>(NavigationManager.BaseUri + "api/traffic");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Eroare la încărcarea fluxurilor de trafic: " + ex.Message);
+        }
     }
 
-    // Funcția pentru a deschide dialogul cu detalii
     private async Task ShowFluxDetaliiDialog(FluxTrafic flux)
     {
         fluxSelectat = flux;
