@@ -1,7 +1,8 @@
 ﻿@page "/utilizatori"
 @using DisertatieWeb.Models
 @using Radzen
-@inject NavigationManager Navigation
+@inject NavigationManager NavigationManager
+@inject IHttpClientFactory HttpClientFactory
 @inject DialogService DialogService
 
 <PageTitle>Utilizatori</PageTitle>
@@ -27,20 +28,24 @@
 </RadzenDataGrid>
 
 @code {
-    private List<UserModel> users = new List<UserModel>
-        {
-        new UserModel { Id = 1, Nume = "Ion Popescu", Email = "ion.popescu@example.com" },
-        new UserModel { Id = 2, Nume = "Maria Ionescu", Email = "maria.ionescu@example.com" }
-        };
-
+    private List<UserModel> users = new();
     private UserModel selectedUser;
-    private UserModel newUser = new UserModel();
+    private UserModel newUser = new();
 
-   
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsers();
+    }
+
+    private async Task LoadUsers()
+    {
+        var http = HttpClientFactory.CreateClient();
+        users = await http.GetFromJsonAsync<List<UserModel>>(NavigationManager.BaseUri + "api/users");
+    }
 
     private async Task ShowAddUserDialog()
     {
-        newUser = new UserModel(); // Resetează câmpurile pentru un utilizator nou
+        newUser = new UserModel();
 
         await DialogService.OpenAsync("Adaugă Utilizator", ds =>
     @<RadzenStack Gap="1.5rem">
@@ -48,60 +53,56 @@
         <RadzenTextBox @bind-Value="newUser.Email" Placeholder="Email Utilizator" />
         <RadzenButton Text="Adaugă" ButtonStyle="ButtonStyle.Primary" Click="AddUser" />
     </RadzenStack>);
-        
     }
 
-    // Afișează dialogul pentru editarea unui utilizator
     private async Task ShowEditUserDialog(UserModel user)
     {
-        try
-        {
-            selectedUser = user; // Setează utilizatorul selectat pentru editare
+        selectedUser = new UserModel
+                {
+                    Id = user.Id,
+                    Nume = user.Nume,
+                    Email = user.Email
+                };
 
-            await DialogService.OpenAsync("Editează Utilizator", ds =>
+        await DialogService.OpenAsync("Editează Utilizator", ds =>
     @<RadzenStack Gap="1.5rem">
         <RadzenTextBox @bind-Value="selectedUser.Nume" Placeholder="Nume Utilizator" />
         <RadzenTextBox @bind-Value="selectedUser.Email" Placeholder="Email Utilizator" />
-        <RadzenButton Text="Salvează Modificări" ButtonStyle="ButtonStyle.Primary" Click="() => EditUser()" />
+        <RadzenButton Text="Salvează" ButtonStyle="ButtonStyle.Primary" Click="EditUser" />
     </RadzenStack>);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Eroare la deschiderea dialogului de editare: {ex.Message}");
-        }
     }
 
-    // Adaugă un utilizator
-    private void AddUser()
+    private async Task AddUser()
     {
-        if (newUser != null)
-        {
-            newUser.Id = users.Count + 1; // Generare ID
-            users.Add(newUser); // Adăugarea utilizatorului în listă
-        }
+        var http = HttpClientFactory.CreateClient();
+        var response = await http.PostAsJsonAsync(NavigationManager.BaseUri + "api/users", newUser);
+
+        if (response.IsSuccessStatusCode)
+            await LoadUsers();
+
+        DialogService.Close();
     }
 
-    // Editează un utilizator
-    private void EditUser()
+    private async Task EditUser()
     {
-        if (selectedUser != null)
-        {
-            var user = users.FirstOrDefault(u => u.Id == selectedUser.Id);
-            if (user != null)
-            {
-                user.Nume = selectedUser.Nume;
-                user.Email = selectedUser.Email;
-            }
-        }
+        var http = HttpClientFactory.CreateClient();
+        var response = await http.PutAsJsonAsync(NavigationManager.BaseUri + $"api/users/{selectedUser.Id}", selectedUser);
+
+        if (response.IsSuccessStatusCode)
+            await LoadUsers();
+
+        DialogService.Close();
     }
 
-    // Șterge un utilizator
-    private void DeleteUser(UserModel user)
+    private async Task DeleteUser(UserModel user)
     {
-        users.Remove(user); // Șterge utilizatorul din listă
+        var http = HttpClientFactory.CreateClient();
+        var response = await http.DeleteAsync(NavigationManager.BaseUri + $"api/users/{user.Id}");
+
+        if (response.IsSuccessStatusCode)
+            await LoadUsers();
     }
 
-    // Selectarea unui rând
     private void OnRowSelect(UserModel user)
     {
         selectedUser = user;

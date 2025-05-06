@@ -17,6 +17,7 @@ namespace DisertatieWeb.Shared.Services
         public DbSet<TrafficFlowMeasurement> TrafficFlowMeasurements { get; set; }
         public DbSet<VisitorFlow> VisitorFlows { get; set; }
         public DbSet<SensorInteraction> SensorInteractions { get; set; }
+        public DbSet<UserSettings> UserSettings { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -255,6 +256,57 @@ namespace DisertatieWeb.Shared.Services
         public string? UltimulComentariu { get; set; }
         [Column("creeated_at")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
+    [Table("user_settings")]
+    public class UserSettings
+    {
+        [Column("id")]
+        public int Id { get; set; }
+
+        [Column("user_id")]
+        public int UserId { get; set; }
+
+        [Column("app_name")]
+        public string AppName { get; set; }
+
+        [Column("app_description")]
+        public string AppDescription { get; set; }
+
+        [Column("maintenance_mode")]
+        public bool MaintenanceMode { get; set; }
+
+        [Column("language_code")]
+        public string LanguageCode { get; set; }
+
+        [Column("timezone")]
+        public string Timezone { get; set; }
+
+        [Column("min_password_length")]
+        public int MinPasswordLength { get; set; }
+
+        [Column("require_special_char")]
+        public bool RequireSpecialChar { get; set; }
+
+        [Column("enable_2fa")]
+        public bool Enable2FA { get; set; }
+
+        [Column("email_from")]
+        public string EmailFrom { get; set; }
+
+        [Column("email_notifications")]
+        public bool EmailNotifications { get; set; }
+
+        [Column("sms_api_key")]
+        public string SmsApiKey { get; set; }
+
+        [Column("sms_notifications")]
+        public bool SmsNotifications { get; set; }
+
+        [Column("created_at")]
+        public DateTime CreatedAt { get; set; }
+
+        [Column("updated_at")]
+        public DateTime UpdatedAt { get; set; }
     }
 
 }

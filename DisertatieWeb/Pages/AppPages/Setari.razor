@@ -1,26 +1,28 @@
 ﻿@page "/setari"
 @using Radzen
 @inject NotificationService NotificationService
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
 <RadzenCard Style="margin: 2rem">
     <RadzenTabs>
-       <Tabs>
+        <Tabs>
             <RadzenTabsItem Text="General">
                 <RadzenFieldset Text="Informații Aplicație" Style="margin-bottom: 1rem;">
-                    <RadzenTextBox @bind-Value="appName" Placeholder="Nume aplicație" Style="width: 300px; margin-bottom: 10px;" />
-                    <RadzenTextBox @bind-Value="appDescription" Placeholder="Descriere" Style="width: 500px; margin-bottom: 10px;" />
-                    <RadzenSwitch @bind-Value="maintenanceMode" Style="margin-top:10px;" />
+                    <RadzenTextBox @bind-Value="settings.AppName" Placeholder="Nume aplicație" Style="width: 300px; margin-bottom: 10px;" />
+                    <RadzenTextBox @bind-Value="settings.AppDescription" Placeholder="Descriere" Style="width: 500px; margin-bottom: 10px;" />
+                    <RadzenSwitch @bind-Value="settings.MaintenanceMode" Style="margin-top:10px;" />
                     <label style="margin-left: 10px;">Mod mentenanță activ</label>
                 </RadzenFieldset>
 
                 <RadzenFieldset Text="Localizare">
-                    <RadzenDropDown @bind-Value="selectedLanguage"
+                    <RadzenDropDown @bind-Value="settings.LanguageCode"
                                     Data="@languages"
                                     TextProperty="Name"
                                     ValueProperty="Code"
                                     Placeholder="Selectează limba"
                                     Style="width: 300px; margin-bottom: 10px;" />
-                    <RadzenDropDown @bind-Value="timezone"
+                    <RadzenDropDown @bind-Value="settings.Timezone"
                                     Data="@timezones"
                                     Placeholder="Selectează fus orar"
                                     Style="width: 300px;" />
@@ -29,32 +31,32 @@
 
             <RadzenTabsItem Text="Securitate">
                 <RadzenFieldset Text="Parolă" Style="margin-bottom: 1rem;">
-                    <RadzenNumeric @bind-Value="minPasswordLength" Min="6" Max="20" Style="width: 150px;" />
+                    <RadzenNumeric @bind-Value="settings.MinPasswordLength" Min="6" Max="20" Style="width: 150px;" />
                     <label style="margin-left: 10px;">Lungime minimă</label>
-                    <RadzenSwitch @bind-Value="requireSpecialChar" Style="margin-top:10px;" />
+                    <RadzenSwitch @bind-Value="settings.RequireSpecialChar" Style="margin-top:10px;" />
                     <label style="margin-left: 10px;">Necesită caractere speciale</label>
                 </RadzenFieldset>
 
                 <RadzenFieldset Text="Autentificare">
-                    <RadzenSwitch @bind-Value="enable2FA" />
+                    <RadzenSwitch @bind-Value="settings.Enable2FA" />
                     <label style="margin-left: 10px;">Activează autentificare în doi pași (2FA)</label>
                 </RadzenFieldset>
             </RadzenTabsItem>
 
             <RadzenTabsItem Text="Notificări">
                 <RadzenFieldset Text="Email" Style="margin-bottom: 1rem;">
-                    <RadzenTextBox @bind-Value="emailFrom" Placeholder="Adresa expeditor" Style="width: 300px; margin-bottom: 10px;" />
-                    <RadzenSwitch @bind-Value="emailNotifications" />
+                    <RadzenTextBox @bind-Value="settings.EmailFrom" Placeholder="Adresa expeditor" Style="width: 300px; margin-bottom: 10px;" />
+                    <RadzenSwitch @bind-Value="settings.EmailNotifications" />
                     <label style="margin-left: 10px;">Trimite notificări email</label>
                 </RadzenFieldset>
 
                 <RadzenFieldset Text="SMS">
-                    <RadzenTextBox @bind-Value="smsProviderApiKey" Placeholder="API Key Provider SMS" Style="width: 400px; margin-bottom: 10px;" />
-                    <RadzenSwitch @bind-Value="smsNotifications" />
+                    <RadzenTextBox @bind-Value="settings.SmsApiKey" Placeholder="API Key Provider SMS" Style="width: 400px; margin-bottom: 10px;" />
+                    <RadzenSwitch @bind-Value="settings.SmsNotifications" />
                     <label style="margin-left: 10px;">Activează notificări SMS</label>
                 </RadzenFieldset>
             </RadzenTabsItem>
-       </Tabs>
+        </Tabs>
     </RadzenTabs>
 
     <div style="margin-top: 20px;">
@@ -63,59 +65,111 @@
     </div>
 </RadzenCard>
 
+
 @code {
-    private string appName = "MyApp";
-    private string appDescription = "Aplicație de administrare";
-    private bool maintenanceMode = false;
+    private int currentUserId = 1; // temporar; înlocuiește cu id real din login
+    private UserSettings settings = new();
 
-    private string selectedLanguage = "ro";
-    private List<LanguageItem> languages = new()
+    protected override async Task OnInitializedAsync()
     {
-        new LanguageItem { Code = "ro", Name = "Română" },
-        new LanguageItem { Code = "en", Name = "Engleză" }
-    };
-    private string timezone = "Europe/Bucharest";
-    private List<string> timezones = new()
-    {
-        "Europe/Bucharest", "Europe/London", "America/New_York", "Asia/Bangkok"
-    };
+        var http = HttpClientFactory.CreateClient();
+        var result = await http.GetAsync(NavigationManager.BaseUri + $"api/usersettings/{currentUserId}");
 
-    private int minPasswordLength = 8;
-    private bool requireSpecialChar = true;
-    private bool enable2FA = false;
-
-    private string emailFrom = "admin@myapp.com";
-    private bool emailNotifications = true;
-    private string smsProviderApiKey = "";
-    private bool smsNotifications = false;
+        if (result.IsSuccessStatusCode)
+        {
+            settings = await result.Content.ReadFromJsonAsync<UserSettings>();
+        }
+        else
+        {
+            // fallback sau creare nouă
+            settings = new UserSettings
+                {
+                    UserId = currentUserId,
+                    AppName = "MyApp",
+                    AppDescription = "Aplicație de administrare",
+                    LanguageCode = "ro",
+                    Timezone = "Europe/Bucharest",
+                    MinPasswordLength = 8,
+                    RequireSpecialChar = true,
+                    Enable2FA = false,
+                    EmailFrom = "admin@myapp.com",
+                    EmailNotifications = true,
+                    SmsApiKey = "",
+                    SmsNotifications = false
+                };
+        }
+    }
 
     private async Task SaveSettings()
     {
-        await Task.Delay(300);
-        NotificationService.Notify(NotificationSeverity.Success, "Setările au fost salvate.");
+        var http = HttpClientFactory.CreateClient();
+        var response = await http.PutAsJsonAsync(NavigationManager.BaseUri + $"api/usersettings/{currentUserId}", settings);
+        if (response.IsSuccessStatusCode)
+            NotificationService.Notify(NotificationSeverity.Success, "Setările au fost salvate.");
     }
 
     private void ResetSettings()
     {
-        appName = "MyApp";
-        appDescription = "Aplicație de administrare";
-        maintenanceMode = false;
-        selectedLanguage = "ro";
-        timezone = "Europe/Bucharest";
-        minPasswordLength = 8;
-        requireSpecialChar = true;
-        enable2FA = false;
-        emailFrom = "admin@myapp.com";
-        emailNotifications = true;
-        smsProviderApiKey = "";
-        smsNotifications = false;
+        settings = new UserSettings
+            {
+                UserId = currentUserId,
+                AppName = "MyApp",
+                AppDescription = "Aplicație de administrare",
+                LanguageCode = "ro",
+                Timezone = "Europe/Bucharest",
+                MinPasswordLength = 8,
+                RequireSpecialChar = true,
+                Enable2FA = false,
+                EmailFrom = "admin@myapp.com",
+                EmailNotifications = true,
+                SmsApiKey = "",
+                SmsNotifications = false
+            };
 
         NotificationService.Notify(NotificationSeverity.Warning, "Setările au fost resetate.");
     }
+    private List<LanguageItem> languages = new()
+    {
+        new LanguageItem { Code = "ro", Name = "Română" },
+        new LanguageItem { Code = "en", Name = "Engleză" },
+        new LanguageItem { Code = "fr", Name = "Franceză" },
+        new LanguageItem { Code = "de", Name = "Germană" }
+    };
+
+    private List<string> timezones = new()
+    {
+        "Europe/Bucharest",
+        "Europe/London",
+        "America/New_York",
+        "Asia/Bangkok",
+        "Asia/Tokyo"
+    };
 
     public class LanguageItem
     {
         public string Code { get; set; }
         public string Name { get; set; }
+    }
+    public class UserSettings
+    {
+        public int Id { get; set; }
+        public int UserId { get; set; }
+
+        public string AppName { get; set; }
+        public string AppDescription { get; set; }
+        public bool MaintenanceMode { get; set; }
+
+        public string LanguageCode { get; set; }
+        public string Timezone { get; set; }
+
+        public int MinPasswordLength { get; set; }
+        public bool RequireSpecialChar { get; set; }
+        public bool Enable2FA { get; set; }
+
+        public string EmailFrom { get; set; }
+        public bool EmailNotifications { get; set; }
+
+        public string SmsApiKey { get; set; }
+        public bool SmsNotifications { get; set; }
     }
 }
