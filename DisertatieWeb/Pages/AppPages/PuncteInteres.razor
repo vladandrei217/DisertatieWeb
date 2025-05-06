@@ -1,5 +1,7 @@
 ﻿@page "/puncte-interes"
 @using DisertatieWeb.Models
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>Lista Puncte de Interes</PageTitle>
 
@@ -12,7 +14,7 @@
             <RadzenDataGridColumn TItem="PunctDeInteresModel" Property="Descriere" Title="Descriere" />
             <RadzenDataGridColumn TItem="PunctDeInteresModel" Title="Imagine">
                 <Template Context="punct">
-                    <img src="@punct.ImagineUrl" alt="Imagine Locatie" width="80" style="border-radius:8px;" />
+                    <img src="@punct.ImagineUrl" alt="Fara imagine" width="80" style="border-radius:8px;" />
                 </Template>
             </RadzenDataGridColumn>
         </Columns>
@@ -22,12 +24,9 @@
 @code {
     private List<PunctDeInteresModel> puncte = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        puncte = new List<PunctDeInteresModel>
-        {
-            new PunctDeInteresModel { Id = 1, Nume = "Ateneul Român", Descriere = "Monument istoric și centru cultural", Latitudine = 44.4412, Longitudine = 26.0975, ImagineUrl = "https://upload.wikimedia.org/wikipedia/commons/3/37/Ateneul_Roman_Bucharest.jpg" },
-            new PunctDeInteresModel { Id = 2, Nume = "Piața Unirii", Descriere = "Cea mai mare piață din București", Latitudine = 44.4268, Longitudine = 26.1025, ImagineUrl = "https://upload.wikimedia.org/wikipedia/commons/d/d5/Piata_Unirii_Bucharest.jpg" }
-        };
+        var http = HttpClientFactory.CreateClient();
+        puncte = await http.GetFromJsonAsync<List<PunctDeInteresModel>>(NavigationManager.BaseUri + "api/puncteinteres");
     }
 }

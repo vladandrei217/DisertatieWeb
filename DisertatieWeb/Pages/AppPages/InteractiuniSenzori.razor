@@ -1,29 +1,23 @@
 ﻿@page "/interactiuni-senzori"
 @using DisertatieWeb.Models
+@inject IHttpClientFactory HttpClientFactory
+@inject NavigationManager NavigationManager
 
 <PageTitle>Interacțiuni Senzori</PageTitle>
 
 <RadzenCard Style="margin:2rem;">
-    <h3>Configurare Interacțiuni Puncte de Interes</h3>
+    <h3>Interacțiuni Reale cu Punctele de Interes</h3>
 
-    <RadzenDataGrid TItem="InteractiuneSenzorModel" Data="@interactiuni" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="DataGridEditMode.Single">
+    <RadzenDataGrid TItem="InteractiuneSenzorModel" Data="@interactiuni" AllowPaging="true" PageSize="5" AllowSorting="true">
         <Columns>
             <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="PunctDeInteres" Title="Punct de Interes" />
-            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="NotificareTrimisa" Title="Trimite Notificare" >
-                <EditTemplate Context="interactiune">
-                    <RadzenCheckBox @bind-Value="interactiune.NotificareTrimisa" />
-                </EditTemplate>
+            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Title="Notificare">
+                <Template Context="data">
+                    <RadzenCheckBox TValue="bool" Value="data.NotificareTrimisa" Disabled="true" />
+                </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="ActivareLumini" Title="Activează Lumini" >
-                <EditTemplate Context="interactiune">
-                    <RadzenCheckBox @bind-Value="interactiune.ActivareLumini" />
-                </EditTemplate>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="RedareMesajAudio" Title="Redă Mesaj Audio" >
-                <EditTemplate Context="interactiune">
-                    <RadzenCheckBox @bind-Value="interactiune.RedareMesajAudio" />
-                </EditTemplate>
-            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="UltimaDetectie" Title="Ultima Detectare" FormatString="{0:dd/MM/yyyy HH:mm}" />
+            <RadzenDataGridColumn TItem="InteractiuneSenzorModel" Property="UltimulComentariu" Title="Comentariu" />
         </Columns>
     </RadzenDataGrid>
 </RadzenCard>
@@ -31,12 +25,9 @@
 @code {
     private List<InteractiuneSenzorModel> interactiuni = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        interactiuni = new List<InteractiuneSenzorModel>
-        {
-            new InteractiuneSenzorModel { Id = 1, PunctDeInteres = "Ateneul Român", NotificareTrimisa = true, ActivareLumini = true, RedareMesajAudio = false },
-            new InteractiuneSenzorModel { Id = 2, PunctDeInteres = "Piața Unirii", NotificareTrimisa = true, ActivareLumini = false, RedareMesajAudio = true }
-        };
+        var http = HttpClientFactory.CreateClient();
+        interactiuni = await http.GetFromJsonAsync<List<InteractiuneSenzorModel>>(NavigationManager.BaseUri + "api/sensorinteractions");
     }
 }

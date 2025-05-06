@@ -16,6 +16,7 @@ namespace DisertatieWeb.Shared.Services
         public DbSet<TrafficFlow> TrafficFlows { get; set; }
         public DbSet<TrafficFlowMeasurement> TrafficFlowMeasurements { get; set; }
         public DbSet<VisitorFlow> VisitorFlows { get; set; }
+        public DbSet<SensorInteraction> SensorInteractions { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -114,6 +115,8 @@ namespace DisertatieWeb.Shared.Services
         public DateTime CreatedAt { get; set; }
         [Column("vizitatori_total")]
         public int VizitatoriTotal { get; set; }
+        [Column("imagine_url")]
+        public string ImagineUrl { get; set; }
     }
 
     public class Comment
@@ -233,4 +236,25 @@ namespace DisertatieWeb.Shared.Services
         [Column("ora_raportarii")]
         public DateTime OraRaportarii { get; set; }
     }
+    [Table("sensor_interactions")]
+    public class SensorInteraction
+    {
+        public int Id { get; set; }
+
+        [Column("poi_id")]
+        public int PoiId { get; set; }
+
+        [ForeignKey("PoiId")]
+        public PointOfInterest PointOfInterest { get; set; }
+
+        [Column("notificare_trimisa")]
+        public bool NotificareTrimisa { get; set; }
+        [Column("ultima_detectie")]
+        public DateTime? UltimaDetectie { get; set; }
+        [Column("ultimul_comentariu")]
+        public string? UltimulComentariu { get; set; }
+        [Column("creeated_at")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    }
+
 }

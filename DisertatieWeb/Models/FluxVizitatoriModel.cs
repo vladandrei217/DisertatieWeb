@@ -21,16 +21,15 @@
         public string Descriere { get; set; }
         public double Latitudine { get; set; }
         public double Longitudine { get; set; }
-        public string ImagineUrl { get; set; }
+        public string? ImagineUrl { get; set; }
     }
     public class InteractiuneSenzorModel
     {
         public int Id { get; set; }
         public string PunctDeInteres { get; set; }
         public bool NotificareTrimisa { get; set; }
-        public bool ActivareLumini { get; set; }
-        public bool RedareMesajAudio { get; set; }
+        public DateTime? UltimaDetectie { get; set; }
+        public string UltimulComentariu { get; set; }
     }
-
 
 }
